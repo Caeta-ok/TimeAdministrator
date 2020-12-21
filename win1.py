@@ -1,160 +1,138 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'win1.ui'
+#
+# Created by: PyQt5 UI code generator 5.9.2
+#
+# WARNING! All changes made in this file will be lost!
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_win1(object):
-    flag_accept_pressed = False
-    __win0_setColNames = None
-
-    # def __init__(self, win0_setColNames):
-    #     self.__win0_setColNames = win0_setColNames
-
     def setupUi(self, win1):
         win1.setObjectName("win1")
-        win1.resize(261, 163)
-        win1.setMinimumSize(QtCore.QSize(261, 163))
-        win1.setMaximumSize(QtCore.QSize(261, 163))
-        win1.setStyleSheet("background-color: rgb(29, 29, 29);")
+        win1.setEnabled(True)
+        win1.resize(376, 290)
+        win1.setTabletTracking(False)
+        win1.setFocusPolicy(QtCore.Qt.StrongFocus)
+        win1.setStyleSheet("background-color: rgb(29, 29, 29);\n"
+"color: rgb(171, 171, 171);")
+        win1.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
+        win1.setAnimated(True)
+        self.centralwidget = QtWidgets.QWidget(win1)
+        self.centralwidget.setObjectName("centralwidget")
+        self.chackbox_csv = QtWidgets.QCheckBox(self.centralwidget)
+        self.chackbox_csv.setEnabled(True)
+        self.chackbox_csv.setGeometry(QtCore.QRect(25, 21, 13, 13))
+        self.chackbox_csv.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.chackbox_csv.setText("")
+        self.chackbox_csv.setObjectName("chackbox_csv")
+        self.lineedit_csv = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_csv.setEnabled(True)
+        self.lineedit_csv.setGeometry(QtCore.QRect(100, 18, 239, 18))
+        self.lineedit_csv.setMouseTracking(True)
+        self.lineedit_csv.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.lineedit_csv.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.lineedit_csv.setStatusTip("")
+        self.lineedit_csv.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_csv.setFrame(True)
+        self.lineedit_csv.setDragEnabled(False)
+        self.lineedit_csv.setObjectName("lineedit_csv")
+        self.examin_button = QtWidgets.QPushButton(self.centralwidget)
+        self.examin_button.setEnabled(True)
+        self.examin_button.setGeometry(QtCore.QRect(270, 42, 70, 22))
+        self.examin_button.setStatusTip("")
+        self.examin_button.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.examin_button.setCheckable(False)
+        self.examin_button.setAutoRepeat(False)
+        self.examin_button.setDefault(False)
+        self.examin_button.setObjectName("examin_button")
+        self.lineedit_service = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_service.setEnabled(False)
+        self.lineedit_service.setGeometry(QtCore.QRect(101, 89, 237, 17))
+        self.lineedit_service.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.lineedit_service.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_service.setObjectName("lineedit_service")
+        self.label_service = QtWidgets.QLabel(self.centralwidget)
+        self.label_service.setEnabled(True)
+        self.label_service.setGeometry(QtCore.QRect(56, 88, 39, 16))
+        self.label_service.setObjectName("label_service")
+        self.label_user = QtWidgets.QLabel(self.centralwidget)
+        self.label_user.setGeometry(QtCore.QRect(68, 115, 27, 16))
+        self.label_user.setObjectName("label_user")
+        self.label_password = QtWidgets.QLabel(self.centralwidget)
+        self.label_password.setGeometry(QtCore.QRect(47, 145, 47, 13))
+        self.label_password.setObjectName("label_password")
+        self.lineedit_user = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_user.setEnabled(False)
+        self.lineedit_user.setGeometry(QtCore.QRect(101, 117, 237, 17))
+        self.lineedit_user.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_user.setObjectName("lineedit_user")
+        self.lineedit_pass = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_pass.setEnabled(False)
+        self.lineedit_pass.setGeometry(QtCore.QRect(101, 145, 237, 17))
+        self.lineedit_pass.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_pass.setObjectName("lineedit_pass")
+        self.lineedit_db_name = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_db_name.setEnabled(False)
+        self.lineedit_db_name.setGeometry(QtCore.QRect(101, 173, 237, 17))
+        self.lineedit_db_name.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_db_name.setObjectName("lineedit_db_name")
+        self.label_database_name = QtWidgets.QLabel(self.centralwidget)
+        self.label_database_name.setGeometry(QtCore.QRect(16, 172, 84, 16))
+        self.label_database_name.setObjectName("label_database_name")
+        self.lineedit_table_name = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_table_name.setEnabled(False)
+        self.lineedit_table_name.setGeometry(QtCore.QRect(101, 201, 237, 17))
+        self.lineedit_table_name.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.lineedit_table_name.setObjectName("lineedit_table_name")
+        self.label_table_name = QtWidgets.QLabel(self.centralwidget)
+        self.label_table_name.setGeometry(QtCore.QRect(36, 200, 63, 16))
+        self.label_table_name.setObjectName("label_table_name")
+        self.accept_button = QtWidgets.QPushButton(self.centralwidget)
+        self.accept_button.setEnabled(False)
+        self.accept_button.setGeometry(QtCore.QRect(110, 244, 75, 23))
+        self.accept_button.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.accept_button.setObjectName("accept_button")
+        self.cancel_button = QtWidgets.QPushButton(self.centralwidget)
+        self.cancel_button.setEnabled(False)
+        self.cancel_button.setGeometry(QtCore.QRect(202, 244, 75, 23))
+        self.cancel_button.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.cancel_button.setObjectName("cancel_button")
+        self.chackbox_database = QtWidgets.QCheckBox(self.centralwidget)
+        self.chackbox_database.setEnabled(True)
+        self.chackbox_database.setGeometry(QtCore.QRect(25, 65, 13, 13))
+        self.chackbox_database.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.chackbox_database.setText("")
+        self.chackbox_database.setObjectName("chackbox_database")
+        self.label_csv = QtWidgets.QLabel(self.centralwidget)
+        self.label_csv.setGeometry(QtCore.QRect(49, 20, 47, 13))
+        self.label_csv.setObjectName("label_csv")
+        self.label_database = QtWidgets.QLabel(self.centralwidget)
+        self.label_database.setGeometry(QtCore.QRect(45, 64, 47, 13))
+        self.label_database.setObjectName("label_database")
+        win1.setCentralWidget(self.centralwidget)
+        self.statusbar = QtWidgets.QStatusBar(win1)
+        self.statusbar.setObjectName("statusbar")
+        win1.setStatusBar(self.statusbar)
 
-        string_style_combos = "background-color: rgb(79, 79, 79);\nselection-background-color: rgb(76, 153, 0);\nselection-color: rgb(255, 238, 193);"
-
-
-        self.__centralwidget = QtWidgets.QWidget(win1)
-        self.__centralwidget.setObjectName("centralwidget")
-        # ---------------------------------------------------------------------------------------- Date Label
-        self.__label_date = QtWidgets.QLabel(self.__centralwidget)
-        self.__label_date.setGeometry(QtCore.QRect(31, 11, 40, 16))
-        self.__label_date.setStyleSheet("color: rgb(79, 79, 79);\n""font: 12pt \"MS Shell Dlg 2\";")
-        self.__label_date.setObjectName("label_date")
-
-        # ---------------------------------------------------------------------------------------- Date Combo Box
-        self.__comboBox_date = QtWidgets.QComboBox(self.__centralwidget)
-        self.__comboBox_date.setGeometry(QtCore.QRect(78, 14, 161, 16))
-        self.__comboBox_date.setStyleSheet(string_style_combos)
-        self.__comboBox_date.setObjectName("comboBox_date")
-
-        # ---------------------------------------------------------------------------------------- Activity Label
-        self.__label_activity = QtWidgets.QLabel(self.__centralwidget)
-        self.__label_activity.setGeometry(QtCore.QRect(10, 37, 61, 16))
-        self.__label_activity.setStyleSheet("color: rgb(79, 79, 79);\n""font: 12pt \"MS Shell Dlg 2\";")
-        self.__label_activity.setObjectName("label_activity")
-
-        # ---------------------------------------------------------------------------------------- Activity Combo Box
-        self.__comboBox_activity = QtWidgets.QComboBox(self.__centralwidget)
-        self.__comboBox_activity.setGeometry(QtCore.QRect(78, 39, 161, 16))
-        self.__comboBox_activity.setStyleSheet(string_style_combos)
-        self.__comboBox_activity.setObjectName("comboBox_activity")
-
-        # ---------------------------------------------------------------------------------------- Details Label
-        self.__label_details = QtWidgets.QLabel(self.__centralwidget)
-        self.__label_details.setGeometry(QtCore.QRect(14, 63, 51, 16))
-        self.__label_details.setStyleSheet("color: rgb(79, 79, 79);\n""font: 12pt \"MS Shell Dlg 2\";")
-        self.__label_details.setObjectName("label_details")
-
-        # ---------------------------------------------------------------------------------------- Details Combo Box
-        self.__comboBox_details = QtWidgets.QComboBox(self.__centralwidget)
-        self.__comboBox_details.setGeometry(QtCore.QRect(77, 65, 161, 16))
-        self.__comboBox_details.setStyleSheet(string_style_combos)
-        self.__comboBox_details.setObjectName("comboBox_details")
-
-        # ---------------------------------------------------------------------------------------- Time Label
-        self.__label_time = QtWidgets.QLabel(self.__centralwidget)
-        self.__label_time.setGeometry(QtCore.QRect(23, 89, 44, 16))
-        self.__label_time.setStyleSheet("color: rgb(79, 79, 79);\n""font: 12pt \"MS Shell Dlg 2\";")
-        self.__label_time.setObjectName("label_time")
-
-        # ---------------------------------------------------------------------------------------- Time Combo Box
-        self.__comboBox_time = QtWidgets.QComboBox(self.__centralwidget)
-        self.__comboBox_time.setGeometry(QtCore.QRect(77, 91, 161, 16))
-        self.__comboBox_time.setStyleSheet(string_style_combos)
-        self.__comboBox_time.setObjectName("comboBox_time")
-
-        self.pushButton_accept = QtWidgets.QPushButton(self.__centralwidget)
-        self.pushButton_accept.setGeometry(QtCore.QRect(73, 121, 75, 23))
-        self.pushButton_accept.setStyleSheet("background-color: rgb(79, 79, 79);")
-        self.pushButton_accept.setObjectName("pushButton_accept")
-
-        self.pushButton_cancel = QtWidgets.QPushButton(self.__centralwidget)
-        self.pushButton_cancel.setGeometry(QtCore.QRect(164, 121, 75, 23))
-        self.pushButton_cancel.setStyleSheet("background-color: rgb(79, 79, 79);")
-        self.pushButton_cancel.setObjectName("pushButton_cancel")
-
-        win1.setCentralWidget(self.__centralwidget)
-        self.__statusbar = QtWidgets.QStatusBar(win1)
-        self.__statusbar.setObjectName("statusbar")
-        win1.setStatusBar(self.__statusbar)
-        self.__retranslateUi(win1)
+        self.retranslateUi(win1)
         QtCore.QMetaObject.connectSlotsByName(win1)
-        win1.setTabOrder(self.__comboBox_details, self.__comboBox_date)
-        win1.setTabOrder(self.__comboBox_date, self.__comboBox_activity)
 
-        # -------------------------------------------------------------------------- Set button actions
-        # self.pushButton_accept.clicked.connect(self.__acceptButtonAction)
-        # self.pushButton_cancel.clicked.connect(self.__acceptButtonAction)
-
-    def __retranslateUi(self, win1):
+    def retranslateUi(self, win1):
         _translate = QtCore.QCoreApplication.translate
-        win1.setWindowTitle(_translate("win1", "Select columns"))
-        self.__label_date.setText(_translate("win1", "Date:"))
-        self.__label_activity.setText(_translate("win1", "Activity:"))
-        self.__label_details.setText(_translate("win1", "Details:"))
-        self.__label_time.setText(_translate("win1", "Time:"))
-        self.pushButton_accept.setText(_translate("win1", "Accept"))
-        self.pushButton_cancel.setText(_translate("win1", "Cancel"))
+        win1.setWindowTitle(_translate("win1", "Configurate Workspace"))
+        self.examin_button.setText(_translate("win1", "Examin"))
+        self.label_service.setText(_translate("win1", "Service:"))
+        self.label_user.setText(_translate("win1", "User:"))
+        self.label_password.setText(_translate("win1", "Password:"))
+        self.label_database_name.setText(_translate("win1", "Database name:"))
+        self.label_table_name.setText(_translate("win1", "Table name:"))
+        self.accept_button.setText(_translate("win1", "Accept"))
+        self.cancel_button.setText(_translate("win1", "Cancel"))
+        self.label_csv.setText(_translate("win1", "CSV"))
+        self.label_database.setText(_translate("win1", "Database"))
 
-    def setOptionsComboBoxDate(self, options = []):
-        self.__comboBox_date.clear()
-        for i in range(len(options)):
-            self.__comboBox_date.addItem(options[i])
-
-    def setOptionsComboBoxActivity(self, options = []):
-        self.__comboBox_activity.clear()
-        for i in range(len(options)):
-            self.__comboBox_activity.addItem(options[i])
-
-    def setOptionsComboBoxDetails(self, options = []):
-        self.__comboBox_details.clear()
-        for i in range(len(options)):
-            self.__comboBox_details.addItem(options[i])
-
-    def setOptionsComboBoxTime(self, options = []):
-        self.__comboBox_time.clear()
-        for i in range(len(options)):
-            self.__comboBox_time.addItem(options[i])
-    
-    def getTextComboBoxDate(self):
-        return self.__comboBox_date.currentText()
-
-    def getTextComboBoxActivity(self):
-        return self.__comboBox_activity.currentText()
-
-    def getTextComboBoxDetails(self):
-        return self.__comboBox_details.currentText()
-
-    def getTextComboBoxTime(self):
-        return self.__comboBox_time.currentText()
-    
-
-    # def __acceptButtonAction(self):
-    #     date_col = self.__comboBox_date.currentText()
-    #     activity_col = self.__comboBox_activity.currentText()
-    #     details_col = self.__comboBox_details.currentText()
-    #     time_col = self.__comboBox_time.currentText()
-    #     self.__win0_setColNames(date_col, activity_col, details_col, time_col)
-        
-    def __cancelButtonAction(self):
-        pass
-    
-    # def getDateCol(self):
-    #     return self.__date_col
-    
-    # def getActivityCol(self):
-    #     return self.__activity_col
-    
-    # def getDetailsCol(self):
-    #     return self.__details_col
-    
-    # def getTimeCol(self):
-    #     return self.__time_col
-    
 
 # if __name__ == "__main__":
 #     import sys
