@@ -32,7 +32,7 @@ class NewGraphWin(QtWidgets.QDialog, Ui_new_graph_win):
 
     def accept(self):
         self.parent.createLinearGraph()
-        self.parent.tabs.setCurrentIndex(self.parent.tabs_number)
+        # self.parent.tabs.setCurrentIndex(self.parent.tabs.count())
         self.destroy()
 
 class Win0(QtWidgets.QMainWindow, Ui_win0):
@@ -67,13 +67,15 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def closeTab(self, event):
         self.tabs.removeTab(event)
+        if self.tabs.count() == 2:
+            self.tabs.setCurrentIndex(0)
 
     def createNewTab(self):
         tab = QtWidgets.QWidget()        
-        # self.tabs.insertTab(self.tabs.count(), tab, " + ")
-        self.tabs.addTab(tab, "+")
+        self.tabs.insertTab(self.tabs.count(), tab, "+")
+        # self.tabs.addTab(tab, "+")
         self.setClosableTabs()
-
+        # self.tabs.setCurrentIndex(self.tabs.count() - 2)
         # --------------------------------------- Create the vertical layout in which the canvas will be putted
         verticalLayoutWidget = QtWidgets.QWidget(tab)
         verticalLayoutWidget.setGeometry(QtCore.QRect(19, 20, 1060, 630))
@@ -92,7 +94,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         linear_graph = LinearGraph()
         self.graph_layouts_list[self.tabs.count() - 2].addWidget(linear_graph.canvas)
         self.tabs.setTabText(self.tabs.count() - 2, "Linear Graph")
-        # self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(self.tabs.count() - 2)
 
 if __name__ == "__main__":
     import sys
