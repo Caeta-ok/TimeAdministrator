@@ -44,50 +44,35 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        tabs_list = []
-        tabs_list.append(self.tab1)
-        tabs_list.append(self.tab2)
-        self.tabs_list = tabs_list
-        self.tabs_number = len(tabs_list)
+        
+        self.tabs.tabBarClicked.connect(self.newTab)
+        self.setClosableTabs()
+        self.tabs.tabCloseRequested.connect(self.closeTab)
+
         graph_layouts_list = []
         graph_layouts_list.append(None)
         graph_layouts_list.append(self.graph_layout)
         self.graph_layouts_list = graph_layouts_list
-        self.tabs.tabBarClicked.connect(self.newTab)
 
     def newTab(self, event):
-        if event == self.tabs_number - 1:
+        if event == self.tabs.count() - 1:
             new_graph = NewGraphWin(self)
             new_graph.exec_()
 
-    def closeTab(self, event):
-        print("Close tab: " + str(event))
-        # widget = self.tabs.widget()
-        if self.flag_close_tab == False:
-            self.tabs.removeTab(event)
-            self.flag_close_tab = True
-        else:
-            self.flag_close_tab = False
-
-    def createNewTab(self):
-        tab = QtWidgets.QWidget()
-        self.tabs.addTab(tab, "+")
-        # --------------------------------------- Set the closable tabs
+    def setClosableTabs(self):
         self.tabs.setTabsClosable(False)
         self.tabs.setTabsClosable(True)
         self.tabs.tabBar().setTabButton(0, QtWidgets.QTabBar.RightSide, None)
-        self.tabs.tabBar().setTabButton(self.tabs_number, QtWidgets.QTabBar.RightSide, None)
+        self.tabs.tabBar().setTabButton(self.tabs.count() - 1, QtWidgets.QTabBar.RightSide, None)
 
-        # -------------------------------------- Set the close tabs functionality
-        # self.tabs.tabCloseRequested(self.tabs_number - 1).connect(self.closeTab)
-        self.tabs.tabCloseRequested.connect(self.closeTab)
-        # self.tabs.tabBar().tabCloseRequested(self.tabs_number - 1).connect(self.closeTab)
-        print("new tab")
+    def closeTab(self, event):
+        self.tabs.removeTab(event)
 
-        # -------------------------------------- Add tab to the list
-        tabs_list = self.tabs_list
-        tabs_list.append(tab)
-        self.tabs_list = tabs_list
+    def createNewTab(self):
+        tab = QtWidgets.QWidget()        
+        # self.tabs.insertTab(self.tabs.count(), tab, " + ")
+        self.tabs.addTab(tab, "+")
+        self.setClosableTabs()
 
         # --------------------------------------- Create the vertical layout in which the canvas will be putted
         verticalLayoutWidget = QtWidgets.QWidget(tab)
@@ -101,17 +86,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         graph_layouts_list = self.graph_layouts_list
         graph_layouts_list.append(graph_layout)
         self.graph_layouts_list = graph_layouts_list
-
-        # -------------------------------------- Set the number of tabs
-        self.tabs_number += 1
         
     def createLinearGraph(self):
         self.createNewTab()
         linear_graph = LinearGraph()
-        self.graph_layouts_list[self.tabs_number - 2].addWidget(linear_graph.canvas)
-
-        self.tabs.setTabText(self.tabs_number - 2, "Linear Graph")
-        self.tabs.setCurrentIndex(self.tabs_number - 2)
+        self.graph_layouts_list[self.tabs.count() - 2].addWidget(linear_graph.canvas)
+        self.tabs.setTabText(self.tabs.count() - 2, "Linear Graph")
+        # self.tabs.setCurrentIndex(0)
 
 if __name__ == "__main__":
     import sys
