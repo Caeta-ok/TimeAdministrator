@@ -230,12 +230,12 @@ class Ui_win0(object):
         self.button_date_selected.setIcon(icon)
         self.button_date_selected.setIconSize(QtCore.QSize(18, 18))
         self.button_date_selected.setObjectName("button_date_selected")
-        self.dateEdit_3 = QtWidgets.QDateEdit(self.frame_2)
-        self.dateEdit_3.setGeometry(QtCore.QRect(8, 30, 65, 21))
-        self.dateEdit_3.setStyleSheet("background-color: rgb(65, 65, 65);")
-        self.dateEdit_3.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.dateEdit_3.setKeyboardTracking(True)
-        self.dateEdit_3.setObjectName("dateEdit_3")
+        self.date_selected = QtWidgets.QDateEdit(self.frame_2)
+        self.date_selected.setGeometry(QtCore.QRect(8, 30, 65, 21))
+        self.date_selected.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.date_selected.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.date_selected.setKeyboardTracking(True)
+        self.date_selected.setObjectName("date_selected")
         self.update_button = QtWidgets.QPushButton(self.frame_2)
         self.update_button.setGeometry(QtCore.QRect(49, 64, 59, 23))
         self.update_button.setStyleSheet("background-color: rgb(65, 65, 65);")
@@ -248,10 +248,6 @@ class Ui_win0(object):
         self.delete_button.setGeometry(QtCore.QRect(185, 64, 59, 23))
         self.delete_button.setStyleSheet("background-color: rgb(65, 65, 65);")
         self.delete_button.setObjectName("delete_button")
-        self.calendar = QtWidgets.QCalendarWidget(self.tab1)
-        self.calendar.setGeometry(QtCore.QRect(559, 463, 260, 193))
-        self.calendar.setStyleSheet("background-color: rgb(50, 50, 50);")
-        self.calendar.setObjectName("calendar")
         self.tabs.addTab(self.tab1, "")
         self.tab2 = QtWidgets.QWidget()
         self.tab2.setObjectName("tab2")
@@ -350,12 +346,13 @@ class Ui_win0(object):
         self.import_menu.setText(_translate("win0", "Import From CSV"))
         self.line_graphic.setText(_translate("win0", "Line Graphic"))
 
-# if __name__ == "__main__":
-#     import sys
-#     app = QtWidgets.QApplication(sys.argv)
-#     win0 = QtWidgets.QMainWindow()
-#     ui = Ui_win0()
-#     ui.setupUi(win0)
-#     win0.show()
-#     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    win0 = QtWidgets.QMainWindow()
+    ui = Ui_win0()
+    ui.setupUi(win0)
+    win0.show()
+    sys.exit(app.exec_())
 
