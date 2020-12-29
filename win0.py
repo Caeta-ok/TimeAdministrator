@@ -79,10 +79,7 @@ class Ui_win0(object):
         self.button_date_to.setStyleSheet("background-color: rgb(65, 65, 65);\n"
 "image: url(:/calendarIcon/calendar2.jpg);")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Active, QtGui.QIcon.On)
-        icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        icon.addPixmap(QtGui.QPixmap(":/calendarIcon/calendar2.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.button_date_to.setIcon(icon)
         self.button_date_to.setIconSize(QtCore.QSize(18, 18))
         self.button_date_to.setObjectName("button_date_to")
@@ -90,7 +87,12 @@ class Ui_win0(object):
         self.button_date_from.setGeometry(QtCore.QRect(266, 28, 24, 20))
         self.button_date_from.setStyleSheet("background-color: rgb(65, 65, 65);\n"
 "image: url(:/calendarIcon/calendar2.jpg);")
-        self.button_date_from.setIcon(icon)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/calendarIcon/calendar2.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Active, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        self.button_date_from.setIcon(icon1)
         self.button_date_from.setIconSize(QtCore.QSize(18, 18))
         self.button_date_from.setObjectName("button_date_from")
         self.min_label_3 = QtWidgets.QLabel(self.frame)
@@ -229,7 +231,8 @@ class Ui_win0(object):
         self.button_date_selected = QtWidgets.QToolButton(self.frame_2)
         self.button_date_selected.setGeometry(QtCore.QRect(72, 31, 24, 20))
         self.button_date_selected.setStyleSheet("background-color: rgb(65, 65, 65);\n"
-"image: url(:/calendarIcon/calendar2.jpg);")
+"image: url(:/calendarIcon/calendar2.jpg);\n"
+"")
         self.button_date_selected.setIcon(icon)
         self.button_date_selected.setIconSize(QtCore.QSize(18, 18))
         self.button_date_selected.setObjectName("button_date_selected")
