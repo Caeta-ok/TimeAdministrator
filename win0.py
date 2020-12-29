@@ -76,7 +76,8 @@ class Ui_win0(object):
         self.button_quit_ops.setObjectName("button_quit_ops")
         self.button_date_to = QtWidgets.QToolButton(self.frame)
         self.button_date_to.setGeometry(QtCore.QRect(359, 28, 24, 20))
-        self.button_date_to.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.button_date_to.setStyleSheet("background-color: rgb(65, 65, 65);\n"
+"image: url(:/calendarIcon/calendar2.jpg);")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon.addPixmap(QtGui.QPixmap("../../Icons/calendar2 (Pressed).jpg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
@@ -87,7 +88,8 @@ class Ui_win0(object):
         self.button_date_to.setObjectName("button_date_to")
         self.button_date_from = QtWidgets.QToolButton(self.frame)
         self.button_date_from.setGeometry(QtCore.QRect(266, 28, 24, 20))
-        self.button_date_from.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.button_date_from.setStyleSheet("background-color: rgb(65, 65, 65);\n"
+"image: url(:/calendarIcon/calendar2.jpg);")
         self.button_date_from.setIcon(icon)
         self.button_date_from.setIconSize(QtCore.QSize(18, 18))
         self.button_date_from.setObjectName("button_date_from")
@@ -190,7 +192,7 @@ class Ui_win0(object):
         self.sec_label.setGeometry(QtCore.QRect(550, 26, 22, 16))
         self.sec_label.setObjectName("sec_label")
         self.activity_label_2 = QtWidgets.QLabel(self.frame_2)
-        self.activity_label_2.setGeometry(QtCore.QRect(160, 12, 37, 17))
+        self.activity_label_2.setGeometry(QtCore.QRect(159, 14, 37, 17))
         self.activity_label_2.setObjectName("activity_label_2")
         self.date_label_2 = QtWidgets.QLabel(self.frame_2)
         self.date_label_2.setGeometry(QtCore.QRect(31, 13, 25, 16))
@@ -216,17 +218,18 @@ class Ui_win0(object):
         self.min_label = QtWidgets.QLabel(self.frame_2)
         self.min_label.setGeometry(QtCore.QRect(513, 25, 19, 16))
         self.min_label.setObjectName("min_label")
-        self.lineEdit = QtWidgets.QLineEdit(self.frame_2)
-        self.lineEdit.setGeometry(QtCore.QRect(103, 32, 141, 20))
-        self.lineEdit.setStyleSheet("background-color: rgb(65, 65, 65);")
-        self.lineEdit.setObjectName("lineEdit")
+        self.activity_line_edit = QtWidgets.QLineEdit(self.frame_2)
+        self.activity_line_edit.setGeometry(QtCore.QRect(103, 32, 141, 20))
+        self.activity_line_edit.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.activity_line_edit.setObjectName("activity_line_edit")
         self.text_description = QtWidgets.QPlainTextEdit(self.frame_2)
         self.text_description.setGeometry(QtCore.QRect(255, 30, 202, 56))
         self.text_description.setStyleSheet("background-color: rgb(65, 65, 65);")
         self.text_description.setObjectName("text_description")
         self.button_date_selected = QtWidgets.QToolButton(self.frame_2)
         self.button_date_selected.setGeometry(QtCore.QRect(72, 31, 24, 20))
-        self.button_date_selected.setStyleSheet("background-color: rgb(65, 65, 65);")
+        self.button_date_selected.setStyleSheet("background-color: rgb(65, 65, 65);\n"
+"image: url(:/calendarIcon/calendar2.jpg);")
         self.button_date_selected.setIcon(icon)
         self.button_date_selected.setIconSize(QtCore.QSize(18, 18))
         self.button_date_selected.setObjectName("button_date_selected")
@@ -346,6 +349,7 @@ class Ui_win0(object):
         self.import_menu.setText(_translate("win0", "Import From CSV"))
         self.line_graphic.setText(_translate("win0", "Line Graphic"))
 
+import source_rc
 
 if __name__ == "__main__":
     import sys
