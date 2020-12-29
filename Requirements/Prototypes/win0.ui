@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>703</width>
-    <height>757</height>
+    <width>1171</width>
+    <height>854</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,171 +18,960 @@
 color: rgb(171, 171, 171);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableWidget" name="table1">
+   <widget class="QTabWidget" name="tabs">
     <property name="geometry">
      <rect>
-      <x>36</x>
-      <y>24</y>
-      <width>448</width>
-      <height>586</height>
+      <x>3</x>
+      <y>9</y>
+      <width>1106</width>
+      <height>788</height>
      </rect>
     </property>
     <property name="contextMenuPolicy">
-     <enum>Qt::CustomContextMenu</enum>
+     <enum>Qt::DefaultContextMenu</enum>
     </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(100, 100, 100, 100);
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <property name="tabsClosable">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="tab1">
+     <attribute name="title">
+      <string>Selected Data</string>
+     </attribute>
+     <widget class="QTableWidget" name="table1">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>20</y>
+        <width>440</width>
+        <height>713</height>
+       </rect>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(100, 100, 100, 100);
 border-color: rgb(47, 47, 47);
 gridline-color: rgb(255, 255, 255);
 color: rgb(100, 100, 100);
 gridline-color: rgb(40, 40, 40);</string>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <property name="rowCount">
-     <number>100</number>
-    </property>
-    <property name="columnCount">
-     <number>4</number>
-    </property>
-    <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>100</number>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>20</number>
-    </attribute>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <column>
-     <property name="text">
-      <string>Date</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Activity</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Details</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Time</string>
-     </property>
-    </column>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="rowCount">
+       <number>100</number>
+      </property>
+      <property name="columnCount">
+       <number>4</number>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>100</number>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>20</number>
+      </attribute>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <column>
+       <property name="text">
+        <string>Date</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Activity</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Details</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Time</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>479</x>
+        <y>20</y>
+        <width>589</width>
+        <height>305</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(65, 65, 65);
+gridline-color: rgb(65, 65, 65);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <widget class="QLabel" name="from_label">
+       <property name="geometry">
+        <rect>
+         <x>224</x>
+         <y>9</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>From</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="min_label_2">
+       <property name="geometry">
+        <rect>
+         <x>251</x>
+         <y>206</y>
+         <width>19</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_hours_2">
+       <property name="geometry">
+        <rect>
+         <x>203</x>
+         <y>226</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="date_label">
+       <property name="geometry">
+        <rect>
+         <x>24</x>
+         <y>31</y>
+         <width>28</width>
+         <height>14</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Date:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="hours_label_3">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>207</y>
+         <width>34</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Hours</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_quit_ops">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>145</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>&lt;-</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="button_date_to">
+       <property name="geometry">
+        <rect>
+         <x>359</x>
+         <y>28</y>
+         <width>24</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);
+image: url(:/calendarIcon/calendar2.jpg);</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../Icons/source.qrc">
+         <normaloff>:/calendarIcon/calendar2.jpg</normaloff>:/calendarIcon/calendar2.jpg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="button_date_from">
+       <property name="geometry">
+        <rect>
+         <x>266</x>
+         <y>28</y>
+         <width>24</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);
+image: url(:/calendarIcon/calendar2.jpg);</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../Icons/source.qrc">
+         <normaloff>:/calendarIcon/calendar2.jpg</normaloff>
+         <normalon>../../Icons/calendar2 (Pressed).jpg</normalon>
+         <activeon>../../Icons/calendar2 (Pressed).jpg</activeon>
+         <selectedon>../../Icons/calendar2 (Pressed).jpg</selectedon>:/calendarIcon/calendar2.jpg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QLabel" name="min_label_3">
+       <property name="geometry">
+        <rect>
+         <x>384</x>
+         <y>207</y>
+         <width>19</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combo_box_ops_date">
+       <property name="geometry">
+        <rect>
+         <x>56</x>
+         <y>28</y>
+         <width>135</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="time_label">
+       <property name="geometry">
+        <rect>
+         <x>22</x>
+         <y>227</y>
+         <width>28</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Time:</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_min_3">
+       <property name="geometry">
+        <rect>
+         <x>374</x>
+         <y>227</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_add_acts">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>116</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>-&gt;</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_sec_2">
+       <property name="geometry">
+        <rect>
+         <x>279</x>
+         <y>226</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QListView" name="all_acts_list">
+       <property name="geometry">
+        <rect>
+         <x>56</x>
+         <y>83</y>
+         <width>220</width>
+         <height>117</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="activity_label">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>78</y>
+         <width>42</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Activity:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="to_label">
+       <property name="geometry">
+        <rect>
+         <x>322</x>
+         <y>9</y>
+         <width>17</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>To</string>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="date_to">
+       <property name="geometry">
+        <rect>
+         <x>294</x>
+         <y>27</y>
+         <width>65</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="keyboardTracking">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="sec_label_2">
+       <property name="geometry">
+        <rect>
+         <x>288</x>
+         <y>207</y>
+         <width>22</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Sec</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_hours_3">
+       <property name="geometry">
+        <rect>
+         <x>336</x>
+         <y>227</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_sec_3">
+       <property name="geometry">
+        <rect>
+         <x>412</x>
+         <y>227</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_min_2">
+       <property name="geometry">
+        <rect>
+         <x>241</x>
+         <y>226</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="activities_show_label">
+       <property name="geometry">
+        <rect>
+         <x>406</x>
+         <y>65</y>
+         <width>93</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Activities To Show</string>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="date_from">
+       <property name="geometry">
+        <rect>
+         <x>202</x>
+         <y>27</y>
+         <width>65</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="keyboardTracking">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combo_box_ops_time">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>227</y>
+         <width>135</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="hours_label_2">
+       <property name="geometry">
+        <rect>
+         <x>207</x>
+         <y>206</y>
+         <width>34</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Hours</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="sec_label_3">
+       <property name="geometry">
+        <rect>
+         <x>421</x>
+         <y>208</y>
+         <width>22</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Sec</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="all_activities_label">
+       <property name="geometry">
+        <rect>
+         <x>137</x>
+         <y>65</y>
+         <width>60</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>All Activities</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="default_button">
+       <property name="geometry">
+        <rect>
+         <x>21</x>
+         <y>265</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+      <widget class="QListView" name="activities_show_list">
+       <property name="geometry">
+        <rect>
+         <x>336</x>
+         <y>83</y>
+         <width>220</width>
+         <height>117</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_2">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>348</y>
+        <width>589</width>
+        <height>95</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="time_label_2">
+       <property name="geometry">
+        <rect>
+         <x>509</x>
+         <y>9</y>
+         <width>24</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Time</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_hours">
+       <property name="geometry">
+        <rect>
+         <x>465</x>
+         <y>45</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="sec_label">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>26</y>
+         <width>22</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Sec</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="activity_label_2">
+       <property name="geometry">
+        <rect>
+         <x>159</x>
+         <y>14</y>
+         <width>37</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Activity</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="date_label_2">
+       <property name="geometry">
+        <rect>
+         <x>31</x>
+         <y>13</y>
+         <width>25</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Date</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_min">
+       <property name="geometry">
+        <rect>
+         <x>503</x>
+         <y>45</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="new_button">
+       <property name="geometry">
+        <rect>
+         <x>7</x>
+         <y>64</y>
+         <width>33</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>New</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spin_sec">
+       <property name="geometry">
+        <rect>
+         <x>541</x>
+         <y>45</y>
+         <width>36</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="description_label">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>10</y>
+         <width>54</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Description</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="hours_label">
+       <property name="geometry">
+        <rect>
+         <x>469</x>
+         <y>25</y>
+         <width>34</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Hours</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="min_label">
+       <property name="geometry">
+        <rect>
+         <x>513</x>
+         <y>25</y>
+         <width>19</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="activity_line_edit">
+       <property name="geometry">
+        <rect>
+         <x>103</x>
+         <y>32</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="text_description">
+       <property name="geometry">
+        <rect>
+         <x>255</x>
+         <y>30</y>
+         <width>202</width>
+         <height>56</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="button_date_selected">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>31</y>
+         <width>24</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);
+image: url(:/calendarIcon/calendar2.jpg);
+</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../Icons/source.qrc">
+         <normaloff>:/calendarIcon/calendar2.jpg</normaloff>:/calendarIcon/calendar2.jpg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="date_selected">
+       <property name="geometry">
+        <rect>
+         <x>8</x>
+         <y>30</y>
+         <width>65</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="keyboardTracking">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="update_button">
+       <property name="geometry">
+        <rect>
+         <x>49</x>
+         <y>64</y>
+         <width>59</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>Update</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="unselect_button">
+       <property name="geometry">
+        <rect>
+         <x>117</x>
+         <y>64</y>
+         <width>59</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>Unselect</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="delete_button">
+       <property name="geometry">
+        <rect>
+         <x>185</x>
+         <y>64</y>
+         <width>59</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab2">
+     <attribute name="title">
+      <string>+</string>
+     </attribute>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>20</y>
+        <width>1060</width>
+        <height>630</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="graph_layout"/>
+     </widget>
+    </widget>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>703</width>
+     <width>1171</width>
      <height>21</height>
     </rect>
    </property>
@@ -204,7 +993,6 @@ gridline-color: rgb(40, 40, 40);</string>
    <addaction name="menuNew"/>
    <addaction name="menuImport"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="new_workspace_menu">
    <property name="text">
     <string>New Workspace</string>
@@ -230,7 +1018,14 @@ gridline-color: rgb(40, 40, 40);</string>
     <string>Import From CSV</string>
    </property>
   </action>
+  <action name="line_graphic">
+   <property name="text">
+    <string>Line Graphic</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../Icons/source.qrc"/>
+ </resources>
  <connections/>
 </ui>
