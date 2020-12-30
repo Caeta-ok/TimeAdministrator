@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImportCsv</class>
+ <widget class="QDialog" name="ImportCsv">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>248</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Import From Csv</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(29, 29, 29);
+color: rgba(171, 171, 171, 171);</string>
+  </property>
+  <widget class="QDialogButtonBox" name="dialog_buttons">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>203</y>
+     <width>156</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_details">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>117</y>
+     <width>154</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_time">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>145</y>
+     <width>154</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="import_button">
+   <property name="geometry">
+    <rect>
+     <x>341</x>
+     <y>27</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_date">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>59</y>
+     <width>29</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Date:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineedit_directory">
+   <property name="geometry">
+    <rect>
+     <x>29</x>
+     <y>29</y>
+     <width>300</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_time">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>143</y>
+     <width>28</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Time:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_date">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>60</y>
+     <width>154</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_activity">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>88</y>
+     <width>154</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_activity">
+   <property name="geometry">
+    <rect>
+     <x>113</x>
+     <y>86</y>
+     <width>42</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Activity:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_details">
+   <property name="geometry">
+    <rect>
+     <x>117</x>
+     <y>115</y>
+     <width>36</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Details:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_involved_people">
+   <property name="geometry">
+    <rect>
+     <x>159</x>
+     <y>173</y>
+     <width>154</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(65, 65, 65);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_involved_people">
+   <property name="geometry">
+    <rect>
+     <x>72</x>
+     <y>172</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Involved People:</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>dialog_buttons</sender>
+   <signal>accepted()</signal>
+   <receiver>ImportCsv</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dialog_buttons</sender>
+   <signal>rejected()</signal>
+   <receiver>ImportCsv</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -5,16 +5,51 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
 from ConfigurateWorkspace import Ui_ConfigurateWorkspace
+from ImportCsv import Ui_ImportCsv
+import pandas as pd
+import os
+import pickle
 
 class Workspace:
-    pass
+    def __init__(self, name):
+        self.name = name
+
+    def setDateFrom(self, date):
+        pass
+
+    def setDateTo(self, date):
+        pass
+
+class WorkspaceCsv(Workspace):
+    def __init__(self, name, directory):
+        super().__init__(name)
+        self.directory = directory.replace("/", "\\")
+        self.sep = ";"
+        self.dataset = None
+
+    def loadDataset(self):
+        path_csv = self.directory + "\\" + self.name + ".csv"
+        if os.path.exists(path_csv):
+            file = open(path_csv, "r")
+        else:
+            file = open(path_csv, "w")
+            file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
+        file.close()
+        self.dataset = pd.read_csv(path_csv, sep = ";")
+
+    def importCsv(self, fields_list, directory):
+        print("importCsv")
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
+    parent = None
     def __init__(self, parent = None):
-        super().__init__(parent)
+        self.parent = parent
+        super().__init__(self.parent)
         self.setupUi(self)
         self.checkbox_csv.clicked.connect(self.csvClicked)
         self.checkbox_database.clicked.connect(self.databaseClicked)
+        self.examin_button.clicked.connect(self.selectCsvDirectory)
 
     def csvClicked(self):
         if self.checkbox_csv.checkState() == 2:
@@ -46,11 +81,30 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.lineedit_user.setEnabled(state)
 
     def accept(self):
-        print("Accept")
+        # ----------------------------------------- Set csv workspace
+        if self.checkbox_csv.checkState() == 2:
+            directory = self.lineedit_csv.text()
+            name = self.lineedit_workspace_name.text()
+            workspace = WorkspaceCsv(name, directory)
+            file = open(directory + "\\" + name + ".works", "wb")
+            pickle.dump(workspace, file)
+            file.close()
+            self.parent.loadWorkspace(workspace)
+        else:
+            # ---------------------------------------- Set database workspace
+            print("database workspace not developed yet")
+
+        # ---------------------------------------- Destroy QDialog
+        self.destroy()
 
     def reject(self):
         print("Reject")
         self.destroy()
+    
+    def selectCsvDirectory(self):
+        directory_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory")
+        print(directory_path)
+        self.lineedit_csv.setText(directory_path)
         
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 class Canvas:
@@ -84,12 +138,62 @@ class NewGraphWin(QtWidgets.QDialog, Ui_new_graph_win):
         self.parent.createLinearGraph()
         self.destroy()
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------
-class Win0(QtWidgets.QMainWindow, Ui_win0):
-    graph_layouts_list = []
-    calendar = None
-    calendar_btn = None
+# -------------------------------------------------------------------------------
+class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
+    def __init__(self, parent=None):
+        self.parent = parent
+        self.fields_list = []
+        super().__init__()
+        self.setupUi(self)
+        self.import_button.clicked.connect(self.openCsv)
+        self.lineedit_directory.setEnabled(False)
+        self.directory = ""
 
+    def openCsv(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Select Csv")
+        self.lineedit_directory.setText(fname[0])
+        self.directory = fname[0].replace("/", "\\")
+        dataset = pd.read_csv(self.directory, sep = ";")
+        self.comboBox_activity.addItems(dataset.columns)
+        self.comboBox_date.addItems(dataset.columns)
+        self.comboBox_time.addItems(dataset.columns)
+        self.comboBox_details.addItems(dataset.columns)
+        self.comboBox_involved_people.addItems(dataset.columns)
+
+    def gatherFields(self):
+        self.fields_list = []
+        self.fields_list.append(self.comboBox_date.currentText())
+        self.fields_list.append(self.comboBox_activity.currentText())
+        self.fields_list.append(self.comboBox_details.currentText())
+        self.fields_list.append(self.comboBox_time.currentText())
+        self.fields_list.append(self.comboBox_involved_people.currentText())
+
+    def validate_duplicates_combobox(self):
+        # If there are one field of the csv file for more than one field of the workspace returns true, else false
+        # functional requeriment: #4 - 2)
+        for i in range(5):
+            if self.fields_list.count(self.fields_list[i]) > 1:
+                print(self.fields_list.count(self.fields_list[i]))
+                return True
+        return False
+
+    def accept(self):
+        self.gatherFields()
+        if self.validate_duplicates_combobox():
+            msg = QtWidgets.QMessageBox(self)
+            msg.setWindowTitle("Duplicates fields")
+            msg.setText("There are duplicates fields")
+            msg.exec_()
+        else:
+            self.parent.workspace.importCsv(self.fields_list, self.directory)
+            self.destroy()
+    
+    def reject(self):
+        print("Reject")
+        self.destroy()
+
+# --------------------------------------------------------------------------------------------------------------------------------------------------------
+class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -97,12 +201,15 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.tabs.tabBarClicked.connect(self.newTab)
         self.setClosableTabs()
         self.tabs.tabCloseRequested.connect(self.closeTab)
+        self.graph_layouts_list = [] # Stores the layouts which contains 
+        self.calendar = None
+        self.calendar_btn = None
+        self.dataset = None
+        self.workspace = None
 
         # ---------------------------------------------------------- Store layouts of the tabs that contains the graphs
-        graph_layouts_list = []
-        graph_layouts_list.append(None)
-        graph_layouts_list.append(self.graph_layout)
-        self.graph_layouts_list = graph_layouts_list
+        self.graph_layouts_list.append(None)
+        self.graph_layouts_list.append(self.graph_layout)
 
         # ----------------------------------------------------------- Set calendar buttons function
         self.button_date_from.clicked.connect(self.showCalendar)
@@ -139,6 +246,25 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
         # ----------------------------------------------------- Set menu bar configuration
         self.new_workspace_menu.triggered.connect(self.newWorkspace)
+        self.import_menu.triggered.connect(self.importCsv)
+        self.setEnabledWidgets(False)
+
+    def setEnabledWidgets(self, state = True):
+        self.tabs.setEnabled(state)
+        self.import_menu.setEnabled(state)
+        self.save_workspace_menu.setEnabled(state)
+        self.saveas_workspace_menu.setEnabled(state)
+
+
+    def loadWorkspace(self, workspace):
+        self.workspace = workspace
+        self.workspace.loadDataset()
+        self.setEnabledWidgets(True)
+
+    def importCsv(self):
+        print("Import csv")
+        import_csv = ImportCsv(self)
+        import_csv.exec_()
 
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.FocusIn:
@@ -149,8 +275,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         return super().eventFilter(obj, event)
 
     def mousePressEvent(self, event):
-        if self.calendar != None:
-            self.destroyCalendar()
+        self.destroyCalendar()
 
     def newTab(self, event):
         self.destroyCalendar()
@@ -225,9 +350,10 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.destroyCalendar()
 
     def destroyCalendar(self):
-        self.calendar.hide()
-        self.calendar.destroy()
-        self.calendar = None
+        if self.calendar != None:
+            self.calendar.hide()
+            self.calendar.destroy()
+            self.calendar = None
     
     def newWorkspace(self):
         print("newWorkspace")
