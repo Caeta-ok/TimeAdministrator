@@ -23,22 +23,26 @@ class Workspace:
 class WorkspaceCsv(Workspace):
     def __init__(self, name, directory):
         super().__init__(name)
-        self.directory = directory.replace("/", "\\")
+        self.directory = directory.replace("/", "\\") # Not contains the name of the file, only the path
         self.sep = ";"
         self.dataset = None
+        self.path_csv = self.directory + "\\" + self.name + ".csv"
 
     def loadDataset(self):
-        path_csv = self.directory + "\\" + self.name + ".csv"
-        if os.path.exists(path_csv):
-            file = open(path_csv, "r")
+        if os.path.exists(self.path_csv):
+            file = open(self.path_csv, "r")
         else:
-            file = open(path_csv, "w")
+            file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
         file.close()
-        self.dataset = pd.read_csv(path_csv, sep = ";")
+        # self.dataset = pd.read_csv(self.path_csv, sep = ";", index_col = "Date", parse_dates = ["Date"])
+        self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
-    def importCsv(self, fields_list, directory):
-        print("importCsv")
+    def setData(self, dataset):
+        self.dataset = dataset
+        print(dataset)
+        # self.dataset.to_csv(self.path_csv, sep = ";", encoding = "utf-8")
+        self.dataset.to_csv(self.path_csv, sep = ";")
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
@@ -59,7 +63,7 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
             self.activateCsvWorkspace()
         elif self.checkbox_csv.checkState() == 0:
             self.activateCsvWorkspace(False)
-    
+
     def databaseClicked(self):
         if self.checkbox_database.checkState() == 2:
             if self.checkbox_csv.checkState() == 2:
@@ -100,12 +104,12 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
     def reject(self):
         print("Reject")
         self.destroy()
-    
+
     def selectCsvDirectory(self):
         directory_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory")
         print(directory_path)
         self.lineedit_csv.setText(directory_path)
-        
+
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 class Canvas:
     def __init__(self):
@@ -143,22 +147,26 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
     def __init__(self, parent=None):
         self.parent = parent
         self.fields_list = []
+        self.normalized_fields_names = ["Date", "Activity", "Details", "Time", "Involved Persons"]
         super().__init__()
         self.setupUi(self)
         self.import_button.clicked.connect(self.openCsv)
         self.lineedit_directory.setEnabled(False)
         self.directory = ""
+        self.imported_dataset = None
+        self.normalized_dataset = None
 
     def openCsv(self):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, "Select Csv")
         self.lineedit_directory.setText(fname[0])
         self.directory = fname[0].replace("/", "\\")
-        dataset = pd.read_csv(self.directory, sep = ";")
-        self.comboBox_activity.addItems(dataset.columns)
-        self.comboBox_date.addItems(dataset.columns)
-        self.comboBox_time.addItems(dataset.columns)
-        self.comboBox_details.addItems(dataset.columns)
-        self.comboBox_involved_people.addItems(dataset.columns)
+        self.imported_dataset = pd.read_csv(self.directory, sep = ";", encoding = "utf-8")
+
+        self.comboBox_date.addItems(self.imported_dataset.columns)
+        self.comboBox_activity.addItems(self.imported_dataset.columns)
+        self.comboBox_details.addItems(self.imported_dataset.columns)
+        self.comboBox_time.addItems(self.imported_dataset.columns)
+        self.comboBox_involved_people.addItems(self.imported_dataset.columns)
 
     def gatherFields(self):
         self.fields_list = []
@@ -185,9 +193,13 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
             msg.setText("There are duplicates fields")
             msg.exec_()
         else:
-            self.parent.workspace.importCsv(self.fields_list, self.directory)
+            self.normalized_dataset = self.imported_dataset[[self.fields_list[i] for i in range(len(self.fields_list))]]
+            self.normalized_dataset.columns = self.normalized_fields_names
+            self.normalized_dataset[["Date"]] = self.normalized_dataset[["Date"]].apply(pd.to_datetime)
+            self.normalized_dataset = self.normalized_dataset.set_index("Date")
+            self.parent.workspace.setData(self.normalized_dataset)
             self.destroy()
-    
+
     def reject(self):
         print("Reject")
         self.destroy()
@@ -201,7 +213,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.tabs.tabBarClicked.connect(self.newTab)
         self.setClosableTabs()
         self.tabs.tabCloseRequested.connect(self.closeTab)
-        self.graph_layouts_list = [] # Stores the layouts which contains 
+        self.graph_layouts_list = [] # Stores the layouts which contains
         self.calendar = None
         self.calendar_btn = None
         self.dataset = None
@@ -217,37 +229,59 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.button_date_selected.clicked.connect(self.showCalendar)
 
         # ----------------------------------------------------------- Set the Event Filter for the widgets
-        self.spin_hours.installEventFilter(self)
-        self.spin_hours_2.installEventFilter(self)
-        self.spin_hours_3.installEventFilter(self)
-        self.spin_min.installEventFilter(self)
-        self.spin_min_2.installEventFilter(self)
-        self.spin_min_3.installEventFilter(self)
-        self.spin_sec.installEventFilter(self)
-        self.spin_sec_2.installEventFilter(self)
-        self.spin_sec_3.installEventFilter(self)
+        # ------------------------------------ Section "Configurate Selection"
+        self.combo_box_ops_date.installEventFilter(self)
+        self.combo_box_ops_time.installEventFilter(self)
+        self.date_from.installEventFilter(self)
+        self.date_to.installEventFilter(self)
         self.all_acts_list.installEventFilter(self)
         self.activities_show_list.installEventFilter(self)
         self.button_add_acts.installEventFilter(self)
         self.button_quit_ops.installEventFilter(self)
-        self.combo_box_ops_date.installEventFilter(self)
-        self.combo_box_ops_time.installEventFilter(self)
+        self.spin_hours_2.installEventFilter(self)
+        self.spin_min_2.installEventFilter(self)
+        self.spin_sec_2.installEventFilter(self)
+        self.spin_hours_3.installEventFilter(self)
+        self.spin_min_3.installEventFilter(self)
+        self.spin_sec_3.installEventFilter(self)
         self.default_button.installEventFilter(self)
+
+        # ------------------------------------ Section "Manage Register"
+        self.date_selected.installEventFilter(self)
+        self.spin_hours.installEventFilter(self)
+        self.spin_min.installEventFilter(self)
+        self.spin_sec.installEventFilter(self)
+        self.activities_list.installEventFilter(self)
+        self.details_list.installEventFilter(self)
+        self.involved_people_list.installEventFilter(self)
+        self.activity_line_edit.installEventFilter(self)
+        self.details_line_edit.installEventFilter(self)
+        self.involved_people_line_edit.installEventFilter(self)
+        self.add_activity_button.installEventFilter(self)
+        self.update_activity_button.installEventFilter(self)
+        self.remove_activity_button.installEventFilter(self)
+        self.add_details_button.installEventFilter(self)
+        self.update_details_button.installEventFilter(self)
+        self.remove_details_button.installEventFilter(self)
+        self.add_involved_people_button.installEventFilter(self)
+        self.update_involved_people_button.installEventFilter(self)
+        self.remove_involved_people_button.installEventFilter(self)
         self.new_button.installEventFilter(self)
         self.update_button.installEventFilter(self)
         self.unselect_button.installEventFilter(self)
         self.delete_button.installEventFilter(self)
-        self.activity_line_edit.installEventFilter(self)
-        self.text_description.installEventFilter(self)
+
+        # ------------------------------------ Other sections
         self.table1.installEventFilter(self)
-        self.date_from.installEventFilter(self)
-        self.date_to.installEventFilter(self)
         self.menubar.installEventFilter(self)
 
-        # ----------------------------------------------------- Set menu bar configuration
+        # ----------------------------------------------------- Set menu bar functions
         self.new_workspace_menu.triggered.connect(self.newWorkspace)
         self.import_menu.triggered.connect(self.importCsv)
+
+        # ---------------------------------------------------- Others
         self.setEnabledWidgets(False)
+        self.loadLastWorkspace()
 
     def setEnabledWidgets(self, state = True):
         self.tabs.setEnabled(state)
@@ -255,14 +289,27 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.save_workspace_menu.setEnabled(state)
         self.saveas_workspace_menu.setEnabled(state)
 
-
     def loadWorkspace(self, workspace):
         self.workspace = workspace
         self.workspace.loadDataset()
+        self.loadTable()
         self.setEnabledWidgets(True)
+        
+    def loadTable(self):
+        # item = QtWidgets.QTableWidgetItem("Hola")
+        print("row count", self.table1.rowCount())
+        # print(item.data())
+
+    def loadLastWorkspace(self):
+        last_file = open("last.txt", "r")
+        file_path = last_file.read()
+        if os.path.exists(file_path + ".works"):
+            file = open(file_path + ".works", "rb")
+            self.workspace = pickle.load(file)
+            self.setEnabledWidgets(True)
+            self.loadWorkspace(self.workspace)
 
     def importCsv(self):
-        print("Import csv")
         import_csv = ImportCsv(self)
         import_csv.exec_()
 
@@ -295,7 +342,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.tabs.setCurrentIndex(0)
 
     def createNewTab(self):
-        tab = QtWidgets.QWidget()        
+        tab = QtWidgets.QWidget()
         self.tabs.insertTab(self.tabs.count(), tab, "+")
         self.setClosableTabs()
 
@@ -311,7 +358,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         graph_layouts_list = self.graph_layouts_list
         graph_layouts_list.append(graph_layout)
         self.graph_layouts_list = graph_layouts_list
-        
+
     def createLinearGraph(self):
         self.createNewTab()
 
@@ -354,11 +401,19 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.calendar.hide()
             self.calendar.destroy()
             self.calendar = None
-    
+
     def newWorkspace(self):
         print("newWorkspace")
         new_workspace_win = ConfigurateWorkspace(self)
         new_workspace_win.exec_()
+
+    def saveLastWorkspaceUsed(self):
+        file = open("last.txt", "w")
+        file.write(self.workspace.directory + "\\" + self.workspace.name)
+        file.close()
+
+    def closeEvent(self, event):
+        self.saveLastWorkspaceUsed()
 
 if __name__ == "__main__":
     import sys
