@@ -10,10 +10,6 @@ import pandas as pd
 import os
 import pickle
 
-class RecordLabel:
-    def __init__(self, value=None):
-        self.value = value 
-
 class Workspace:
     def __init__(self, name):
         self.name = name
@@ -24,6 +20,7 @@ class Workspace:
     def setDateTo(self, date):
         pass
 
+
 class WorkspaceCsv(Workspace):
     def __init__(self, name, directory):
         super().__init__(name)
@@ -32,6 +29,10 @@ class WorkspaceCsv(Workspace):
         self.dataset = None
         self.path_csv = self.directory + "\\" + self.name + ".csv"
 
+        self.activity_labels = []
+        self.details_labels = []
+        self.involved_people_labels = []
+
     def loadDataset(self):
         if os.path.exists(self.path_csv):
             file = open(self.path_csv, "r")
@@ -39,15 +40,19 @@ class WorkspaceCsv(Workspace):
             file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
         file.close()
-        # self.dataset = pd.read_csv(self.path_csv, sep = ";", index_col = "Date", parse_dates = ["Date"])
         self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
     def setData(self, dataset):
         self.dataset = dataset
-        print(dataset)
-        # self.dataset.to_csv(self.path_csv, sep = ";", encoding = "utf-8")
         self.dataset.to_csv(self.path_csv, sep = ";")
-
+    
+    def set_activities_labels(self):
+        for i in range(len(self.dataset)):
+            record_labels = self.dataset.loc[i, "Activity"].split(",")
+            for label in record_labels:
+                if label not in self.activity_labels:
+                    self.activity_labels.append(label)
+        print(self.activity_labels)
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
     parent = None
@@ -202,6 +207,8 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
             self.normalized_dataset[["Date"]] = self.normalized_dataset[["Date"]].apply(pd.to_datetime)
             self.normalized_dataset = self.normalized_dataset.set_index("Date")
             self.parent.workspace.setData(self.normalized_dataset)
+            self.parent.workspace.loadDataset()
+            self.parent.loadTable()
             self.destroy()
 
     def reject(self):
@@ -296,17 +303,21 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
     def loadWorkspace(self, workspace):
         self.workspace = workspace
         self.workspace.loadDataset()
-        self.loadTable()
+        if len(self.workspace.dataset) > 0: #If the dataset get at least 1 record 
+            self.loadTable()
         self.setEnabledWidgets(True)
         
     def loadTable(self):
         rows_num = len(self.workspace.dataset)
         cols_num = self.table1.columnCount()
         values = self.workspace.dataset.values
-        self.table1.setRowCount(rows_num)
+        print("rows_num: ", rows_num)
+        if rows_num > 100: # If there are more rows than 100 (default number)
+            self.table1.setRowCount(rows_num)
         for i in range(rows_num):
             for j in range(cols_num):
                 self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(str(values[i][j])))
+        self.workspace.set_activities_labels()
 
     def loadLastWorkspace(self):
         last_file = open("last.txt", "r")
