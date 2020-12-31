@@ -24,7 +24,7 @@ class Ui_win0(object):
         self.tab1 = QtWidgets.QWidget()
         self.tab1.setObjectName("tab1")
         self.table1 = QtWidgets.QTableWidget(self.tab1)
-        self.table1.setGeometry(QtCore.QRect(24, 20, 540, 713))
+        self.table1.setGeometry(QtCore.QRect(24, 20, 544, 713))
         self.table1.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.table1.setStyleSheet("background-color: rgba(100, 100, 100, 100);\n"
 "border-color: rgb(47, 47, 47);\n"
@@ -34,7 +34,7 @@ class Ui_win0(object):
         self.table1.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.table1.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.table1.setRowCount(100)
-        self.table1.setColumnCount(6)
+        self.table1.setColumnCount(5)
         self.table1.setObjectName("table1")
         item = QtWidgets.QTableWidgetItem()
         self.table1.setHorizontalHeaderItem(0, item)

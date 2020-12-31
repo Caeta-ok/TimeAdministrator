@@ -45,7 +45,7 @@ color: rgb(171, 171, 171);</string>
        <rect>
         <x>24</x>
         <y>20</y>
-        <width>540</width>
+        <width>544</width>
         <height>713</height>
        </rect>
       </property>
@@ -69,7 +69,7 @@ gridline-color: rgb(40, 40, 40);</string>
        <number>100</number>
       </property>
       <property name="columnCount">
-       <number>6</number>
+       <number>5</number>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>100</number>
@@ -202,7 +202,6 @@ gridline-color: rgb(40, 40, 40);</string>
         <string>Involved People</string>
        </property>
       </column>
-      <column/>
      </widget>
      <widget class="QFrame" name="configurate_selection_frame">
       <property name="geometry">

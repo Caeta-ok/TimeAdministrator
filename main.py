@@ -10,6 +10,10 @@ import pandas as pd
 import os
 import pickle
 
+class RecordLabel:
+    def __init__(self, value=None):
+        self.value = value 
+
 class Workspace:
     def __init__(self, name):
         self.name = name
@@ -296,9 +300,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.setEnabledWidgets(True)
         
     def loadTable(self):
-        # item = QtWidgets.QTableWidgetItem("Hola")
-        print("row count", self.table1.rowCount())
-        # print(item.data())
+        rows_num = len(self.workspace.dataset)
+        cols_num = self.table1.columnCount()
+        values = self.workspace.dataset.values
+        self.table1.setRowCount(rows_num)
+        for i in range(rows_num):
+            for j in range(cols_num):
+                self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(str(values[i][j])))
 
     def loadLastWorkspace(self):
         last_file = open("last.txt", "r")
