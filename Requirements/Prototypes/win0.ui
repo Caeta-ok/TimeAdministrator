@@ -290,11 +290,11 @@ gridline-color: rgb(65, 65, 65);</string>
         <string>Hours</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="button_quit_ops">
+      <widget class="QPushButton" name="button_quit_all_ops">
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>146</y>
+         <y>115</y>
          <width>35</width>
          <height>23</height>
         </rect>
@@ -303,7 +303,7 @@ gridline-color: rgb(65, 65, 65);</string>
         <string notr="true">background-color: rgb(65, 65, 65);</string>
        </property>
        <property name="text">
-        <string>&lt;-</string>
+        <string>&lt;-*</string>
        </property>
       </widget>
       <widget class="QToolButton" name="button_date_to">
@@ -415,11 +415,11 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
         <string notr="true">background-color: rgb(65, 65, 65);</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="button_add_acts">
+      <widget class="QPushButton" name="button_add_all_acts">
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>117</y>
+         <y>86</y>
          <width>35</width>
          <height>23</height>
         </rect>
@@ -428,7 +428,7 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
         <string notr="true">background-color: rgb(65, 65, 65);</string>
        </property>
        <property name="text">
-        <string>-&gt;</string>
+        <string>*-&gt;</string>
        </property>
       </widget>
       <widget class="QSpinBox" name="spin_sec_2">
@@ -678,6 +678,38 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
        </property>
        <property name="text">
         <string>CONFIGURATE SELECTION</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_add_acts">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>144</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>-&gt;</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_quit_ops">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>173</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>&lt;-</string>
        </property>
       </widget>
      </widget>

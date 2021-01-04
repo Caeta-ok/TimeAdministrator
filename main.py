@@ -9,6 +9,9 @@ from ImportCsv import Ui_ImportCsv
 import pandas as pd
 import os
 import pickle
+# from datetime import date
+# import datetime as dt
+
 
 class Workspace:
     def __init__(self, name):
@@ -19,7 +22,6 @@ class Workspace:
 
     def setDateTo(self, date):
         pass
-
 
 class WorkspaceCsv(Workspace):
     def __init__(self, name, directory):
@@ -32,27 +34,59 @@ class WorkspaceCsv(Workspace):
         self.activity_labels = []
         self.details_labels = []
         self.involved_people_labels = []
+        self.selected_date_option = "Last year"
 
     def loadDataset(self):
         if os.path.exists(self.path_csv):
-            file = open(self.path_csv, "r")
+            # file = open(self.path_csv, "r")
+            pass
         else:
             file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
-        file.close()
+            file.close()
+        # file.close()
+
+        # ------------------------------------------------- Load dataframe with csv data and configurate it
+        # self.dataset = pd.read_csv(self.path_csv, sep = ";", parse_dates = ["Date"])
         self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
-    def setData(self, dataset):
+        if len(self.dataset) > 0: # If there are one record at least
+            pass
+            self.dataset[["Date"]] = self.dataset[["Date"]].apply(pd.to_datetime)
+            self.dataset["Date"] = self.dataset["Date"].dt.date
+            self.dataset = self.dataset.sort_values("Date")
+        # print(self.dataset)
+
+    def setData(self, dataset): # Change name to "setDataStored"
         self.dataset = dataset
+        # if os.path.exists(self.path_csv): # Verifiy if exists path_csv and if so remove it
+        #     os.remove(self.path_csv)
         self.dataset.to_csv(self.path_csv, sep = ";")
-    
+
+    def setSelectedDate(self, option = "Last year"):
+        initial_date = 0
+        final_date = 0
+        self.selected_date_option = option
+        self.loadDataset()
+        if len(self.dataset) > 0:
+            if self.selected_date_option == "Last month":
+                included = self.dataset["Date"].map(lambda x: x.month) == 11
+                initial_date = self.dataset[included].values[0][0]
+                final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+
+            if self.selected_date_option == "Last year":
+                included = self.dataset["Date"].map(lambda x: x.year) == 2020
+                initial_date = self.dataset[included].values[0][0]
+                final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+            self.dataset =  self.dataset[included]
+
     def set_activities_labels(self):
         for i in range(len(self.dataset)):
             record_labels = self.dataset.loc[i, "Activity"].split(",")
             for label in record_labels:
                 if label not in self.activity_labels:
                     self.activity_labels.append(label)
-        print(self.activity_labels)
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
     parent = None
@@ -169,7 +203,9 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, "Select Csv")
         self.lineedit_directory.setText(fname[0])
         self.directory = fname[0].replace("/", "\\")
-        self.imported_dataset = pd.read_csv(self.directory, sep = ";", encoding = "utf-8")
+        # print(self.directory)
+        self.imported_dataset = pd.read_csv(self.directory, sep = ";")
+        # print(self.imported_dataset)
 
         self.comboBox_date.addItems(self.imported_dataset.columns)
         self.comboBox_activity.addItems(self.imported_dataset.columns)
@@ -204,11 +240,18 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         else:
             self.normalized_dataset = self.imported_dataset[[self.fields_list[i] for i in range(len(self.fields_list))]]
             self.normalized_dataset.columns = self.normalized_fields_names
-            self.normalized_dataset[["Date"]] = self.normalized_dataset[["Date"]].apply(pd.to_datetime)
+            # self.normalized_dataset[["Date"]] = self.normalized_dataset[["Date"]].apply(pd.to_datetime)
+            self.normalized_dataset["Date"] = pd.to_datetime(self.normalized_dataset["Date"], format = "%d/%m/%Y", errors = "coerce")
+            print(self.normalized_dataset)
+            # for i in range(len(self.normalized_dataset)):
+            #     print(self.normalized_dataset.loc[i, "Date"])
+            # self.normalized_dataset = self.normalized_dataset.sort_values("Date")
+
             self.normalized_dataset = self.normalized_dataset.set_index("Date")
+            
             self.parent.workspace.setData(self.normalized_dataset)
             self.parent.workspace.loadDataset()
-            self.parent.loadTable()
+            self.parent.loadTable(self.parent.workspace.dataset)
             self.destroy()
 
     def reject(self):
@@ -219,6 +262,7 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
 class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
         super().__init__()
+        self.selected_date_options = ["Last year", "Last month", "Entire history", "Custom period"]
         self.setupUi(self)
         # ---------------------------------------------------------- Set the configuration of the tabs
         self.tabs.tabBarClicked.connect(self.newTab)
@@ -292,6 +336,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
         # ---------------------------------------------------- Others
         self.setEnabledWidgets(False)
+        self.combo_box_ops_date.addItems(self.selected_date_options)
         self.loadLastWorkspace()
 
     def setEnabledWidgets(self, state = True):
@@ -303,41 +348,64 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
     def loadWorkspace(self, workspace):
         self.workspace = workspace
         self.workspace.loadDataset()
-        if len(self.workspace.dataset) > 0: #If the dataset get at least 1 record 
-            self.loadTable()
+        if len(self.workspace.dataset) > 0: #If the dataset get at least 1 record
+            self.loadTable(self.workspace.dataset)
         self.setEnabledWidgets(True)
-        
-    def loadTable(self):
-        rows_num = len(self.workspace.dataset)
+
+    def loadTable(self, dataset):
+        rows_num = len(dataset)
         cols_num = self.table1.columnCount()
-        values = self.workspace.dataset.values
-        print("rows_num: ", rows_num)
+        values = dataset.values
+        # print("loadTable")
+        # print("   rows_num: ", rows_num)
         if rows_num > 100: # If there are more rows than 100 (default number)
             self.table1.setRowCount(rows_num)
+        elif rows_num < 100:
+            self.table1.setRowCount(100)
+
+        if rows_num < self.table1.rowCount(): # If new records are less than previous records in the table then clean the table
+            difference = self.table1.rowCount() - rows_num
+            for i in range(rows_num, rows_num + difference):
+                for j in range(cols_num):
+                    self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(""))
+
         for i in range(rows_num):
             for j in range(cols_num):
                 self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(str(values[i][j])))
-        self.workspace.set_activities_labels()
+        # self.workspace.set_activities_labels()
+        # self.workspace.setSelectedDate(self.table1)
+
 
     def loadLastWorkspace(self):
-        last_file = open("last.txt", "r")
-        file_path = last_file.read()
-        if os.path.exists(file_path + ".works"):
-            file = open(file_path + ".works", "rb")
-            self.workspace = pickle.load(file)
-            self.setEnabledWidgets(True)
-            self.loadWorkspace(self.workspace)
+        if os.path.exists("last.txt"):
+            last_file = open("last.txt", "r")
+            file_path = last_file.read()
+            if os.path.exists(file_path + ".works"): # If exists .works file
+                file = open(file_path + ".works", "rb")
+                self.workspace = pickle.load(file)
+                file.close()
+                self.setEnabledWidgets(True)
+                self.loadWorkspace(self.workspace)
 
     def importCsv(self):
         import_csv = ImportCsv(self)
         import_csv.exec_()
 
     def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.FocusIn:
-            self.mousePressEvent(event)
-        elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()):
-            if event.type() == QtCore.QEvent.MouseButtonPress:
+        if self.workspace != None:
+            if event.type() == QtCore.QEvent.FocusIn:
                 self.mousePressEvent(event)
+
+            elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()):
+                if event.type() == QtCore.QEvent.MouseButtonPress:
+                    self.mousePressEvent(event)
+
+            elif type(obj) == type(QtWidgets.QComboBox()):
+                if obj.objectName() == "combo_box_ops_date": # If date selection combo box its clicked
+                    if type(event) == QtGui.QPaintEvent:
+                        print("eventFilter: ", obj.currentText())
+                        self.workspace.setSelectedDate(obj.currentText())
+                        self.loadTable(self.workspace.dataset)
         return super().eventFilter(obj, event)
 
     def mousePressEvent(self, event):
@@ -422,7 +490,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.calendar = None
 
     def newWorkspace(self):
-        print("newWorkspace")
         new_workspace_win = ConfigurateWorkspace(self)
         new_workspace_win.exec_()
 
