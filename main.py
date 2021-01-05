@@ -10,9 +10,6 @@ import pandas as pd
 import os
 import pickle
 import datetime as dt
-# from datetime import date
-# import datetime as dt
-
 
 class Workspace:
     def __init__(self, name):
@@ -50,7 +47,6 @@ class WorkspaceCsv(Workspace):
         self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
         if len(self.dataset) > 0: # If there are one record at least
-            print("Configurate dataset")
             self.dataset[["Date"]] = self.dataset[["Date"]].apply(pd.to_datetime)
             self.dataset["Date"] = self.dataset["Date"].dt.date
             self.dataset = self.dataset.sort_values("Date")
@@ -290,7 +286,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.all_acts_list.installEventFilter(self)
         self.activities_show_list.installEventFilter(self)
         self.button_add_acts.installEventFilter(self)
-        self.button_quit_ops.installEventFilter(self)
+        self.button_quit_acts.installEventFilter(self)
         self.spin_hours_2.installEventFilter(self)
         self.spin_min_2.installEventFilter(self)
         self.spin_sec_2.installEventFilter(self)
@@ -477,6 +473,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.calendar.setStyleSheet("background-color: rgb(45, 45, 45);\ncolor: rgb(200, 200, 200);\nalternate-background-color: rgb(85, 85, 127);\ngridline-color: rgb(255, 255, 255);")
             self.calendar.setGridVisible(True)
             self.calendar.setFirstDayOfWeek(QtCore.Qt.Monday)
+            # ------------------------------------------------------ Set actual date
+            if self.calendar_btn.objectName() == "button_date_from":
+                d = self.workspace.initial_date
+            elif self.calendar_btn.objectName() == "button_date_to":
+                d = self.workspace.final_date
+            self.calendar.setSelectedDate(QtCore.QDate(d.year, d.month, d.day))
             self.calendar.show()
             self.calendar.clicked.connect(self.clickCalendar)
 

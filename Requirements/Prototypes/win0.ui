@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1529</width>
-    <height>854</height>
+    <height>856</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -209,7 +209,7 @@ gridline-color: rgb(40, 40, 40);</string>
         <x>610</x>
         <y>19</y>
         <width>589</width>
-        <height>305</height>
+        <height>433</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -241,8 +241,8 @@ gridline-color: rgb(65, 65, 65);</string>
       <widget class="QLabel" name="min_label_2">
        <property name="geometry">
         <rect>
-         <x>251</x>
-         <y>206</y>
+         <x>256</x>
+         <y>396</y>
          <width>19</width>
          <height>16</height>
         </rect>
@@ -254,8 +254,8 @@ gridline-color: rgb(65, 65, 65);</string>
       <widget class="QSpinBox" name="spin_hours_2">
        <property name="geometry">
         <rect>
-         <x>203</x>
-         <y>226</y>
+         <x>209</x>
+         <y>372</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -280,8 +280,8 @@ gridline-color: rgb(65, 65, 65);</string>
       <widget class="QLabel" name="hours_label_3">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>207</y>
+         <x>345</x>
+         <y>397</y>
          <width>34</width>
          <height>16</height>
         </rect>
@@ -290,7 +290,7 @@ gridline-color: rgb(65, 65, 65);</string>
         <string>Hours</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="button_quit_all_ops">
+      <widget class="QPushButton" name="button_quit_all_acts">
        <property name="geometry">
         <rect>
          <x>290</x>
@@ -366,8 +366,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QLabel" name="min_label_3">
        <property name="geometry">
         <rect>
-         <x>384</x>
-         <y>207</y>
+         <x>389</x>
+         <y>397</y>
          <width>19</width>
          <height>16</height>
         </rect>
@@ -392,8 +392,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QLabel" name="time_label">
        <property name="geometry">
         <rect>
-         <x>22</x>
-         <y>227</y>
+         <x>28</x>
+         <y>373</y>
          <width>28</width>
          <height>16</height>
         </rect>
@@ -405,8 +405,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QSpinBox" name="spin_min_3">
        <property name="geometry">
         <rect>
-         <x>374</x>
-         <y>227</y>
+         <x>380</x>
+         <y>373</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -434,8 +434,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QSpinBox" name="spin_sec_2">
        <property name="geometry">
         <rect>
-         <x>279</x>
-         <y>226</y>
+         <x>285</x>
+         <y>372</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -450,7 +450,7 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
          <x>56</x>
          <y>83</y>
          <width>220</width>
-         <height>117</height>
+         <height>112</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -505,8 +505,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QLabel" name="sec_label_2">
        <property name="geometry">
         <rect>
-         <x>288</x>
-         <y>207</y>
+         <x>293</x>
+         <y>397</y>
          <width>22</width>
          <height>16</height>
         </rect>
@@ -518,8 +518,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QSpinBox" name="spin_hours_3">
        <property name="geometry">
         <rect>
-         <x>336</x>
-         <y>227</y>
+         <x>342</x>
+         <y>373</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -531,8 +531,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QSpinBox" name="spin_sec_3">
        <property name="geometry">
         <rect>
-         <x>412</x>
-         <y>227</y>
+         <x>418</x>
+         <y>373</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -544,8 +544,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QSpinBox" name="spin_min_2">
        <property name="geometry">
         <rect>
-         <x>241</x>
-         <y>226</y>
+         <x>247</x>
+         <y>372</y>
          <width>36</width>
          <height>22</height>
         </rect>
@@ -589,8 +589,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QComboBox" name="combo_box_ops_time">
        <property name="geometry">
         <rect>
-         <x>55</x>
-         <y>227</y>
+         <x>61</x>
+         <y>373</y>
          <width>135</width>
          <height>20</height>
         </rect>
@@ -602,8 +602,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QLabel" name="hours_label_2">
        <property name="geometry">
         <rect>
-         <x>207</x>
-         <y>206</y>
+         <x>212</x>
+         <y>396</y>
          <width>34</width>
          <height>16</height>
         </rect>
@@ -615,8 +615,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QLabel" name="sec_label_3">
        <property name="geometry">
         <rect>
-         <x>421</x>
-         <y>208</y>
+         <x>426</x>
+         <y>398</y>
          <width>22</width>
          <height>16</height>
         </rect>
@@ -641,8 +641,8 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
       <widget class="QPushButton" name="default_button">
        <property name="geometry">
         <rect>
-         <x>21</x>
-         <y>265</y>
+         <x>25</x>
+         <y>401</y>
          <width>75</width>
          <height>23</height>
         </rect>
@@ -660,7 +660,7 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
          <x>336</x>
          <y>83</y>
          <width>220</width>
-         <height>117</height>
+         <height>112</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -696,7 +696,7 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
         <string>-&gt;</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="button_quit_ops">
+      <widget class="QPushButton" name="button_quit_acts">
        <property name="geometry">
         <rect>
          <x>290</x>
@@ -712,12 +712,167 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
         <string>&lt;-</string>
        </property>
       </widget>
+      <widget class="QLabel" name="people_show_label">
+       <property name="geometry">
+        <rect>
+         <x>413</x>
+         <y>208</y>
+         <width>77</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>People to Show</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="all_people_label">
+       <property name="geometry">
+        <rect>
+         <x>141</x>
+         <y>208</y>
+         <width>49</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>All People</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_quit_people">
+       <property name="geometry">
+        <rect>
+         <x>289</x>
+         <y>316</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>&lt;-</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_quit_all_people">
+       <property name="geometry">
+        <rect>
+         <x>289</x>
+         <y>258</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>&lt;-*</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="people_label">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>221</y>
+         <width>42</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>People:</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_add_people">
+       <property name="geometry">
+        <rect>
+         <x>289</x>
+         <y>287</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>-&gt;</string>
+       </property>
+      </widget>
+      <widget class="QListView" name="people_show_list">
+       <property name="geometry">
+        <rect>
+         <x>335</x>
+         <y>226</y>
+         <width>220</width>
+         <height>112</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_add_all_people">
+       <property name="geometry">
+        <rect>
+         <x>289</x>
+         <y>229</y>
+         <width>35</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+       <property name="text">
+        <string>*-&gt;</string>
+       </property>
+      </widget>
+      <widget class="QListView" name="all_people_list">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>226</y>
+         <width>220</width>
+         <height>112</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(65, 65, 65);</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="from_label_2">
+       <property name="geometry">
+        <rect>
+         <x>254</x>
+         <y>354</y>
+         <width>26</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>From</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="to_label_2">
+       <property name="geometry">
+        <rect>
+         <x>393</x>
+         <y>356</y>
+         <width>17</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>To</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QFrame" name="manage_register_frame">
       <property name="geometry">
        <rect>
-        <x>611</x>
-        <y>347</y>
+        <x>610</x>
+        <y>466</y>
         <width>696</width>
         <height>272</height>
        </rect>
