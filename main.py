@@ -45,10 +45,8 @@ class WorkspaceCsv(Workspace):
             file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
             file.close()
-        # file.close()
 
         # ------------------------------------------------- Load dataframe with csv data and configurate it
-        # self.dataset = pd.read_csv(self.path_csv, sep = ";", parse_dates = ["Date"])
         self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
         if len(self.dataset) > 0: # If there are one record at least
@@ -67,7 +65,6 @@ class WorkspaceCsv(Workspace):
     def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
         self.loadDataset()
-        print("len dataset: ", len(self.dataset))
         if len(self.dataset) > 0:
             if self.selected_date_option != "Custom period":
                 if self.selected_date_option == "Last month":
@@ -86,8 +83,6 @@ class WorkspaceCsv(Workspace):
             else:
                 parent.setEnabledSelectionCalendarButtons(True)
                 included = self.dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
-                # # included = self.dataset[(self.dataset["Date"] >= self.initial_date) & (self.dataset["Date"] <= self.final_date)]
-                # print(included)
             self.dataset =  self.dataset[included]
 
     def set_activities_labels(self):
@@ -487,8 +482,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def clickCalendar(self, date):
         btn_name = self.calendar_btn.objectName()
-        print("clickCalendar")
-        print("date: ", date, " | type: ", type(date))
         d = dt.date(date.year(), date.month(), date.day())
         # ------------------------------------------ Set date
         if btn_name != "button_date_selected":
