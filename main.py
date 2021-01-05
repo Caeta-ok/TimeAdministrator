@@ -9,6 +9,7 @@ from ImportCsv import Ui_ImportCsv
 import pandas as pd
 import os
 import pickle
+import datetime as dt
 # from datetime import date
 # import datetime as dt
 
@@ -30,17 +31,17 @@ class WorkspaceCsv(Workspace):
         self.sep = ";"
         self.dataset = None
         self.path_csv = self.directory + "\\" + self.name + ".csv"
+        # self.parent = parent
 
         self.activity_labels = []
         self.details_labels = []
         self.involved_people_labels = []
         self.selected_date_option = "Last year"
+        self.initial_date = dt.date(2000, 1, 1)
+        self.final_date = dt.date(2000, 1, 1)
 
     def loadDataset(self):
-        if os.path.exists(self.path_csv):
-            # file = open(self.path_csv, "r")
-            pass
-        else:
+        if os.path.exists(self.path_csv) == False:
             file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved Person")
             file.close()
@@ -51,7 +52,7 @@ class WorkspaceCsv(Workspace):
         self.dataset = pd.read_csv(self.path_csv, sep = ";")
 
         if len(self.dataset) > 0: # If there are one record at least
-            pass
+            print("Configurate dataset")
             self.dataset[["Date"]] = self.dataset[["Date"]].apply(pd.to_datetime)
             self.dataset["Date"] = self.dataset["Date"].dt.date
             self.dataset = self.dataset.sort_values("Date")
@@ -63,21 +64,30 @@ class WorkspaceCsv(Workspace):
         #     os.remove(self.path_csv)
         self.dataset.to_csv(self.path_csv, sep = ";")
 
-    def setSelectedDate(self, option = "Last year"):
-        initial_date = 0
-        final_date = 0
+    def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
         self.loadDataset()
+        print("len dataset: ", len(self.dataset))
         if len(self.dataset) > 0:
-            if self.selected_date_option == "Last month":
-                included = self.dataset["Date"].map(lambda x: x.month) == 11
-                initial_date = self.dataset[included].values[0][0]
-                final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+            if self.selected_date_option != "Custom period":
+                if self.selected_date_option == "Last month":
+                    parent.setEnabledSelectionCalendarButtons(False)
+                    included = self.dataset["Date"].map(lambda x: x.month) == dt.date.today().month
+                elif self.selected_date_option == "Last year":
+                    parent.setEnabledSelectionCalendarButtons(False)
+                    included = self.dataset["Date"].map(lambda x: x.year) == 2020 # 2020 for test
+                elif self.selected_date_option == "Entire history":
+                    parent.setEnabledSelectionCalendarButtons(False)
+                    included = self.dataset["Date"].map(lambda x: x == x)
 
-            if self.selected_date_option == "Last year":
-                included = self.dataset["Date"].map(lambda x: x.year) == 2020
-                initial_date = self.dataset[included].values[0][0]
-                final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+                if len(self.dataset[included]) > 0:
+                    self.initial_date = self.dataset[included].values[0][0]
+                    self.final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+            else:
+                parent.setEnabledSelectionCalendarButtons(True)
+                included = self.dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
+                # # included = self.dataset[(self.dataset["Date"] >= self.initial_date) & (self.dataset["Date"] <= self.final_date)]
+                # print(included)
             self.dataset =  self.dataset[included]
 
     def set_activities_labels(self):
@@ -89,7 +99,6 @@ class WorkspaceCsv(Workspace):
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
-    parent = None
     def __init__(self, parent = None):
         self.parent = parent
         super().__init__(self.parent)
@@ -240,15 +249,9 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         else:
             self.normalized_dataset = self.imported_dataset[[self.fields_list[i] for i in range(len(self.fields_list))]]
             self.normalized_dataset.columns = self.normalized_fields_names
-            # self.normalized_dataset[["Date"]] = self.normalized_dataset[["Date"]].apply(pd.to_datetime)
             self.normalized_dataset["Date"] = pd.to_datetime(self.normalized_dataset["Date"], format = "%d/%m/%Y", errors = "coerce")
-            print(self.normalized_dataset)
-            # for i in range(len(self.normalized_dataset)):
-            #     print(self.normalized_dataset.loc[i, "Date"])
-            # self.normalized_dataset = self.normalized_dataset.sort_values("Date")
-
             self.normalized_dataset = self.normalized_dataset.set_index("Date")
-            
+        
             self.parent.workspace.setData(self.normalized_dataset)
             self.parent.workspace.loadDataset()
             self.parent.loadTable(self.parent.workspace.dataset)
@@ -338,6 +341,11 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.setEnabledWidgets(False)
         self.combo_box_ops_date.addItems(self.selected_date_options)
         self.loadLastWorkspace()
+        self.setEnabledSelectionCalendarButtons(False)
+
+    def setEnabledSelectionCalendarButtons(self, state = True):
+        self.button_date_from.setEnabled(state)
+        self.button_date_to.setEnabled(state)
 
     def setEnabledWidgets(self, state = True):
         self.tabs.setEnabled(state)
@@ -353,11 +361,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.setEnabledWidgets(True)
 
     def loadTable(self, dataset):
+        # Questions
+        # Why dataset its passed by reference and it's not called from workspace inside function?
+        # Could it work in another way?
         rows_num = len(dataset)
         cols_num = self.table1.columnCount()
         values = dataset.values
-        # print("loadTable")
-        # print("   rows_num: ", rows_num)
+
         if rows_num > 100: # If there are more rows than 100 (default number)
             self.table1.setRowCount(rows_num)
         elif rows_num < 100:
@@ -372,9 +382,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         for i in range(rows_num):
             for j in range(cols_num):
                 self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(str(values[i][j])))
-        # self.workspace.set_activities_labels()
-        # self.workspace.setSelectedDate(self.table1)
 
+        # -------------------------------------------------------------- Set date in the QDateEdit widgets
+        d1 = self.workspace.initial_date
+        d2 = self.workspace.final_date
+        self.date_from.setDate(QtCore.QDate(d1.year, d1.month, d1.day))
+        self.date_to.setDate(QtCore.QDate(d2.year, d2.month, d2.day))
 
     def loadLastWorkspace(self):
         if os.path.exists("last.txt"):
@@ -393,22 +406,22 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def eventFilter(self, obj, event):
         if self.workspace != None:
-            if event.type() == QtCore.QEvent.FocusIn:
+            if event.type() == QtCore.QEvent.FocusIn: # If focus in widget
                 self.mousePressEvent(event)
 
-            elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()):
-                if event.type() == QtCore.QEvent.MouseButtonPress:
+            elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()): # If it's list or menubar
+                if event.type() == QtCore.QEvent.MouseButtonPress: # If it was clicked
                     self.mousePressEvent(event)
 
-            elif type(obj) == type(QtWidgets.QComboBox()):
+            elif type(obj) == type(QtWidgets.QComboBox()): # If type widget it's combo box
                 if obj.objectName() == "combo_box_ops_date": # If date selection combo box its clicked
                     if type(event) == QtGui.QPaintEvent:
-                        print("eventFilter: ", obj.currentText())
-                        self.workspace.setSelectedDate(obj.currentText())
+                        self.workspace.setSelectedDate(obj.currentText(), self)
                         self.loadTable(self.workspace.dataset)
         return super().eventFilter(obj, event)
 
     def mousePressEvent(self, event):
+        # print("mouse pressed")
         self.destroyCalendar()
 
     def newTab(self, event):
@@ -474,11 +487,21 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def clickCalendar(self, date):
         btn_name = self.calendar_btn.objectName()
+        print("clickCalendar")
+        print("date: ", date, " | type: ", type(date))
+        d = dt.date(date.year(), date.month(), date.day())
         # ------------------------------------------ Set date
-        if btn_name == "button_date_from":
-            self.date_from.setDate(date)
-        elif btn_name == "button_date_to":
-            self.date_to.setDate(date)
+        if btn_name != "button_date_selected":
+            if btn_name == "button_date_from":
+                # For workspace it's used datetime.date type because dataframe works with it
+                self.date_from.setDate(date)
+                self.workspace.initial_date = d
+            elif btn_name == "button_date_to":
+                self.date_to.setDate(date)
+                self.workspace.final_date = d
+            print("Load table")
+            self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
+            self.loadTable(self.workspace.dataset)
         else:
             self.date_selected.setDate(date)
         self.destroyCalendar()
