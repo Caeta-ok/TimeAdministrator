@@ -64,10 +64,6 @@ class WorkspaceCsv(Workspace):
     def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
         self.loadDataset()
-        # visible_activities = []
-        # hidden_activities = []
-        # visible_people = []
-        # hidden_people = []
 
         if len(self.dataset) > 0:
             if self.selected_date_option != "Custom period":
@@ -93,8 +89,8 @@ class WorkspaceCsv(Workspace):
             # ---------------------------------------------------------------------------- Set previously labels activities
             hidden_activities = self.hidden_activities_labels
             hidden_people = self.hidden_involved_people_labels
-            self.setAllActivitiesLabels()
-            self.setAllInvolvedPeopleLabels()
+            self.setActivitiesLabels()
+            self.setInvolvedPeopleLabels()
 
             for label in self.visible_activities_labels:
                 if label in hidden_activities:
@@ -107,24 +103,9 @@ class WorkspaceCsv(Workspace):
             self.filterPeopleLabels()
             self.filterActivitiesLabels()
 
-            # if len(self.dataset) > 0:
-            #     print("len dataset: ", len(self.dataset))
-            #     print("last index: ", self.dataset.index[-1])
-
-            # for i in range(self.item_model_visible_acts.rowCount()):
-            #     visible_activities.append(self.item_model_visible_acts.item(i, 0).text())
-            # for i in range(self.item_model_hidden_acts.rowCount()):
-            #     hidden_activities.append(self.item_model_hidden_acts.item(i, 0).text())
-            # if len(visible_activities) == 0 and len(hidden_activities) == 0:
-            #     self.workspace.setAllActivitiesLabels()
-            # else:
-            #     self.visible_activities_labels = visible_activities
-            #     self.hidden_activities_labels = hidden_activities
-            # self.filterActivitiesLabels()
-            # self.filterPeopleLabels()
-
-    def setAllActivitiesLabels(self):
+    def setActivitiesLabels(self):
         # By default all activities labels are stored in activity_labels_show list
+        self.visible_activities_labels = []
         for i in self.dataset.loc[:, "Activity"]:
             if str(i) != "nan":
                 record_labels = str(i).split(",")
@@ -132,19 +113,15 @@ class WorkspaceCsv(Workspace):
                     if label not in self.visible_activities_labels:
                         self.visible_activities_labels.append(label)
 
-    def setAllInvolvedPeopleLabels(self):
+    def setInvolvedPeopleLabels(self):
         # By default all people labels are stored in involved_people_labels_show list
+        self.visible_involved_people_labels = []
         for i in self.dataset.loc[:, "Involved People"]:
             if str(i) != "nan":
                 record_labels = str(i).split(",")
                 for label in record_labels:
                     if label not in self.visible_involved_people_labels:
-                        # print("label: ", label)
                         self.visible_involved_people_labels.append(label)
-        # for i in self.visible_involved_people_labels:
-        #     # print(i, " | len: ", len(i))
-        #     if "Tiziana" in i:
-        #         print("len: ", len(i))
     
     def labelInList(self, string, label_list):
         # Detect if a substring comma separated in list and returns True
@@ -158,7 +135,6 @@ class WorkspaceCsv(Workspace):
 
     def filterActivitiesLabels(self):
         # If records which contains the activities labels that are hidden it will be removed of the dataframe to show
-        # print("filterActivityLabels -----------------------------------------------------------------------------------------------")
         if len(self.hidden_activities_labels) > 0:
             for i, string in enumerate(self.dataset.loc[:, "Activity"]):
                 if self.labelInList(string, self.hidden_activities_labels):
@@ -166,9 +142,6 @@ class WorkspaceCsv(Workspace):
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
     
     def filterPeopleLabels(self):
-        # print(self.dataset.columns)
-        # include = self.dataset["Involved People"].map(lambda label: self.labelInList(label, self.visible_involved_people_labels))
-        # self.dataset = self.dataset[include]
         if len(self.hidden_involved_people_labels) > 0:
             for i, string in enumerate(self.dataset.loc[:, "Involved People"]):
                 if self.labelInList(string, self.hidden_involved_people_labels):
@@ -478,16 +451,17 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.workspace.visible_activities_labels.append(item.text())
             self.hidden_acts_list.model().removeRow(item.row())
         self.hidden_acts_list.selectionModel().clearSelection()
-        self.workspace.setAllActivitiesLabels()
+        self.workspace.setActivitiesLabels()
         self.workspace.filterActivitiesLabels()
+        self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
         self.loadTable(self.workspace.dataset)
 
     def hidePeople(self):
         for index in self.visible_people_list.selectedIndexes():
             item = self.visible_people_list.model().itemFromIndex(index)
             self.hidden_people_list.model().appendRow(QtGui.QStandardItem(item.text()))
-            self.workspace.visible_people_labels.remove(item.text())
-            self.workspace.hidden_people_labels.append(item.text())
+            self.workspace.visible_involved_people_labels.remove(item.text())
+            self.workspace.hidden_involved_people_labels.append(item.text())
             self.visible_people_list.model().removeRow(item.row())
         self.visible_people_list.selectionModel().clearSelection()
         self.workspace.filterPeopleLabels()
@@ -497,12 +471,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         for index in self.hidden_people_list.selectedIndexes():
             item = self.hidden_people_list.model().itemFromIndex(index)
             self.visible_people_list.model().appendRow(QtGui.QStandardItem(item.text()))
-            self.workspace.hidden_people_labels.remove(item.text())
-            self.workspace.visible_people_labels.append(item.text())
+            self.workspace.hidden_involved_people_labels.remove(item.text())
+            self.workspace.visible_involved_people_labels.append(item.text())
             self.hidden_people_list.model().removeRow(item.row())
         self.hidden_people_list.selectionModel().clearSelection()
-        self.workspace.setAllInvolvedPeopleLabels()
+        self.workspace.setInvolvedPeopleLabels()
         self.workspace.filterPeopleLabels()
+        self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
         self.loadTable(self.workspace.dataset)
 
     def itemSelectedVisibleActs(self):
@@ -544,13 +519,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.workspace = workspace
         self.workspace.loadDataset()
         if len(self.workspace.dataset) > 0: #If the dataset get at least 1 record
+            self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
             self.loadTable(self.workspace.dataset)
         self.setEnabledWidgets(True)
 
     def loadTable(self, dataset):
-        # Questions
-        # Why dataset its passed by reference and it's not called from workspace inside function?
-        # Could it work in another way?
+        print("loadTable")
         rows_num = len(dataset)
         cols_num = self.table1.columnCount()
         values = dataset.values
@@ -577,18 +551,34 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.date_to.setDate(QtCore.QDate(d2.year, d2.month, d2.day))
 
         # self.workspace.setAllInvolvedPeopleLabels() # codigo sospechoso
-        self.loadActsTable()
-        self.loadInvolvedPeopleTable()
+        self.loadVisibleActsTable()
+        self.loadVisibleInvolvedPeopleTable()
+        self.loadHiddenActsTable()
+        self.loadHiddenInvolvedPeopleTable()
 
-    def loadActsTable(self): # Load all activities labels table
+    def loadVisibleActsTable(self): # Load all activities labels table
+        self.item_model_visible_acts.clear()
         for i in self.workspace.visible_activities_labels:
             item = QtGui.QStandardItem(i)
             self.item_model_visible_acts.appendRow(item)
+    
+    def loadHiddenActsTable(self):
+        self.item_model_hidden_acts.clear()
+        for i in self.workspace.hidden_activities_labels:
+            item = QtGui.QStandardItem(i)
+            self.item_model_hidden_acts.appendRow(item)
 
-    def loadInvolvedPeopleTable(self):
+    def loadVisibleInvolvedPeopleTable(self):
+        self.item_model_visible_people.clear()
         for i in self.workspace.visible_involved_people_labels:
             item = QtGui.QStandardItem(i)
             self.item_model_visible_people.appendRow(item)
+
+    def loadHiddenInvolvedPeopleTable(self):
+        self.item_model_hidden_people.clear()
+        for i in self.workspace.hidden_involved_people_labels:
+            item = QtGui.QStandardItem(i)
+            self.item_model_hidden_people.appendRow(item)
 
     def loadLastWorkspace(self):
         if os.path.exists("last.txt"):
@@ -630,7 +620,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                 if obj.objectName() == "combo_box_ops_date": # If date selection combo box its clicked
                     if type(event) == QtGui.QPaintEvent:
                         if obj.currentText() != self.workspace.selected_date_option: # If option was changed
-                            print("event: ", event, " | current text: ", obj.currentText())
                             self.workspace.setSelectedDate(obj.currentText(), self)
                             self.loadTable(self.workspace.dataset)
         return super().eventFilter(obj, event)
