@@ -112,6 +112,7 @@ class WorkspaceCsv(Workspace):
                 for label in record_labels:
                     if label not in self.visible_activities_labels:
                         self.visible_activities_labels.append(label)
+        self.visible_activities_labels.sort()
 
     def setInvolvedPeopleLabels(self):
         # By default all people labels are stored in involved_people_labels_show list
@@ -122,6 +123,7 @@ class WorkspaceCsv(Workspace):
                 for label in record_labels:
                     if label not in self.visible_involved_people_labels:
                         self.visible_involved_people_labels.append(label)
+        self.visible_involved_people_labels.sort()
     
     def labelInList(self, string, label_list):
         # Detect if a substring comma separated in list and returns True
@@ -147,6 +149,28 @@ class WorkspaceCsv(Workspace):
                 if self.labelInList(string, self.hidden_involved_people_labels):
                     self.dataset.drop([i], axis = 0, inplace = True)
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
+    
+    def changeActLabel(self, prev_label, new_label):
+        # 0) Get the strings to handle (prev_label and new_label)
+        # 1) Load all labels of the csv
+        # 2) Replace all substrings which contains the label
+        # 3) Reload dataset
+
+        dataset = pd.read_csv(self.path_csv, sep = ";")
+
+        for i, string in enumerate(dataset["Activity"]):
+            dataset.loc[i, "Activity"] = string.replace(prev_label, new_label)
+        dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
+        dataset = dataset.set_index("Date")
+        dataset.to_csv(self.path_csv, sep = ";")
+
+    def changePeopleLabel(self, prev_label, new_label):
+        dataset = pd.read_csv(self.path_csv, sep = ";")
+        for i, string in enumerate(dataset["Involved People"]):
+            dataset.loc[i, "Involved People"] = string.replace(prev_label, new_label)
+        dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
+        dataset = dataset.set_index("Date")
+        dataset.to_csv(self.path_csv, sep = ";")
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
@@ -320,6 +344,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.tabs.tabBarClicked.connect(self.newTab)
         self.setClosableTabs()
         self.tabs.tabCloseRequested.connect(self.closeTab)
+        self.current_item_selected = "" # When an item it's selected in a QListView widget
 
         # ---------------------------------------------------------- Instance attributes
         self.graph_layouts_list = [] # Stores the layouts which contains
@@ -418,6 +443,11 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.setModel(self.item_model_hidden_acts)
         self.hidden_people_list.setModel(self.item_model_hidden_people)
 
+        self.item_model_visible_acts.itemChanged.connect(self.actsItemChanged)
+        self.item_model_visible_people.itemChanged.connect(self.peopleItemChanged)
+        self.item_model_hidden_acts.itemChanged.connect(self.actsItemChanged)
+        self.item_model_hidden_people.itemChanged.connect(self.peopleItemChanged)
+
         # --------------------------------------------------- Set activity and people labels filters functionality
         for button in [self.button_hide_act, self.button_visible_act, self.button_visible_people, self.button_hide_people]:
             button.setEnabled(False)
@@ -431,6 +461,25 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.visible_people_list.selectionModel().selectionChanged.connect(self.itemSelectedVisibilePeople)
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
+
+    def actsItemChanged(self, item):
+        # It take the previously item selected and change it for the new item
+        self.workspace.changeActLabel(self.current_item_selected, item.text())
+        self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
+        self.loadTable(self.workspace.dataset)
+        self.current_item_selected = ""
+
+    def peopleItemChanged(self, item):
+        self.workspace.changePeopleLabel(self.current_item_selected, item.text())
+        self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
+        self.loadTable(self.workspace.dataset)
+        self.current_item_selected = ""
+    
+    # def hiddenActsItemChanged(self, item):
+    #     pass
+
+    # def hiddenPeopleItemChanged(self, item):
+    #     pass
 
     def hideAct(self):
         for index in self.visible_acts_list.selectedIndexes(): # This dloop has a bug
@@ -481,10 +530,16 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.loadTable(self.workspace.dataset)
 
     def itemSelectedVisibleActs(self):
-        self.button_hide_act.setEnabled(bool(self.visible_acts_list.selectedIndexes()))
+        # print("itemSelectedVisibleActs")
+        selected_indexes = self.visible_acts_list.selectedIndexes()
+        self.button_hide_act.setEnabled(bool(selected_indexes))
         self.button_visible_act.setEnabled(False)
         self.button_visible_people.setEnabled(False)
         self.button_hide_people.setEnabled(False)
+        if len(self.visible_acts_list.selectedIndexes()) > 0:
+            for index in self.visible_acts_list.selectedIndexes():
+                self.current_item_selected = self.visible_acts_list.model().itemFromIndex(index).text()
+                break
 
     def itemSelectedHiddenActs(self):
         self.button_visible_act.setEnabled(bool(self.hidden_acts_list.selectedIndexes()))
@@ -524,7 +579,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.setEnabledWidgets(True)
 
     def loadTable(self, dataset):
-        print("loadTable")
+        # print("loadTable")
         rows_num = len(dataset)
         cols_num = self.table1.columnCount()
         values = dataset.values
@@ -615,6 +670,10 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()): # If it's list or menubar
                 if event.type() == QtCore.QEvent.MouseButtonPress: # If it was clicked
                     self.mousePressEvent(event)
+                # if obj.objectName() == "visible_acts_list":
+                    # print("obj: ", obj.objectName(), " | event: ", event)
+                    # if type(event) == type(QtGui.QKeyEvent(QtGui.QEvent(), 1)):
+                        # print("event key: ", event.values)
 
             elif type(obj) == type(QtWidgets.QComboBox()): # If type widget it's combo box
                 if obj.objectName() == "combo_box_ops_date": # If date selection combo box its clicked
