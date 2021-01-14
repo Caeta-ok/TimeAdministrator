@@ -155,19 +155,54 @@ class WorkspaceCsv(Workspace):
         # 1) Load all labels of the csv
         # 2) Replace all substrings which contains the label
         # 3) Reload dataset
+        for i, label in enumerate(self.hidden_activities_labels):
+            if label == prev_label:
+                self.hidden_activities_labels[i] = new_label
 
         dataset = pd.read_csv(self.path_csv, sep = ";")
-
         for i, string in enumerate(dataset["Activity"]):
-            dataset.loc[i, "Activity"] = string.replace(prev_label, new_label)
+            split_string = string.split(",")
+            new_string = ""
+            j = 0
+            while j < len(split_string) - 1:
+                if split_string[j] == prev_label:
+                    new_string += new_label + ","
+                else:
+                    new_string += split_string[j] + ","
+                j += 1
+            # ----------------------------------------------------- In last label comma is not write
+            if split_string[len(split_string) - 1] == prev_label:
+                new_string += new_label
+            else:
+                new_string += split_string[len(split_string) - 1]
+            dataset.loc[i, "Activity"] = new_string
         dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
         dataset = dataset.set_index("Date")
         dataset.to_csv(self.path_csv, sep = ";")
 
     def changePeopleLabel(self, prev_label, new_label):
+        for i, label in enumerate(self.hidden_involved_people_labels):
+            if label == prev_label:
+                self.hidden_involved_people_labels[i] = new_label
+
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Involved People"]):
-            dataset.loc[i, "Involved People"] = string.replace(prev_label, new_label)
+            if str(string) != "nan":
+                split_string = string.split(",")
+                new_string = ""
+                j = 0
+                while j < len(split_string) - 1:
+                    if split_string[j] == prev_label:
+                        new_string += new_label + ","
+                    else:
+                        new_string += split_string[j] + ","
+                    j += 1
+                # ----------------------------------------------------- In last label comma is not write
+                if split_string[len(split_string) - 1] == prev_label:
+                    new_string += new_label
+                else:
+                    new_string += split_string[len(split_string) - 1]
+                dataset.loc[i, "Involved People"] = new_string
         dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
         dataset = dataset.set_index("Date")
         dataset.to_csv(self.path_csv, sep = ";")
@@ -546,18 +581,30 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.button_hide_act.setEnabled(False)
         self.button_visible_people.setEnabled(False)
         self.button_hide_people.setEnabled(False)
+        if len(self.hidden_acts_list.selectedIndexes()) > 0:
+            for index in self.hidden_acts_list.selectedIndexes():
+                self.current_item_selected = self.hidden_acts_list.model().itemFromIndex(index).text()
+                break
 
     def itemSelectedVisibilePeople(self):
         self.button_hide_people.setEnabled(bool(self.visible_people_list.selectedIndexes()))
         self.button_visible_people.setEnabled(False)
         self.button_visible_act.setEnabled(False)
         self.button_hide_act.setEnabled(False)
+        if len(self.visible_people_list.selectedIndexes()) > 0:
+            for index in self.visible_people_list.selectedIndexes():
+                self.current_item_selected = self.visible_people_list.model().itemFromIndex(index).text()
+                break
 
     def itemSelectedHiddenPeople(self):
         self.button_visible_people.setEnabled(bool(self.hidden_people_list.selectedIndexes()))
         self.button_hide_people.setEnabled(False)
         self.button_visible_act.setEnabled(False)
         self.button_hide_act.setEnabled(False)
+        if len(self.hidden_people_list.selectedIndexes()) > 0:
+            for index in self.hidden_people_list.selectedIndexes():
+                self.current_item_selected = self.hidden_people_list.model().itemFromIndex(index).text()
+                break
 
     def setEnabledSelectionCalendarButtons(self, state = True):
         self.button_date_from.setEnabled(state)
