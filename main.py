@@ -10,6 +10,7 @@ import pandas as pd
 import os
 import pickle
 import datetime as dt
+from warning_msg_replace_label import Ui_warning_msg_replace_label
 
 class Workspace:
     def __init__(self, name):
@@ -95,7 +96,7 @@ class WorkspaceCsv(Workspace):
             for label in self.visible_activities_labels:
                 if label in hidden_activities:
                     self.visible_activities_labels.remove(label)
-            
+
             for label in self.visible_involved_people_labels:
                 if label in hidden_people:
                     self.visible_involved_people_labels.remove(label)
@@ -124,10 +125,10 @@ class WorkspaceCsv(Workspace):
                     if label not in self.visible_involved_people_labels:
                         self.visible_involved_people_labels.append(label)
         self.visible_involved_people_labels.sort()
-    
+
     def labelInList(self, string, label_list):
         # Detect if a substring comma separated in list and returns True
-        if str(string) != "nan": 
+        if str(string) != "nan":
             for s in string.split(","):
                 if s in label_list:
                     return True # If data it's in label list
@@ -142,14 +143,14 @@ class WorkspaceCsv(Workspace):
                 if self.labelInList(string, self.hidden_activities_labels):
                     self.dataset.drop([i], axis = 0, inplace = True)
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
-    
+
     def filterPeopleLabels(self):
         if len(self.hidden_involved_people_labels) > 0:
             for i, string in enumerate(self.dataset.loc[:, "Involved People"]):
                 if self.labelInList(string, self.hidden_involved_people_labels):
                     self.dataset.drop([i], axis = 0, inplace = True)
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
-    
+
     def changeActLabel(self, prev_label, new_label):
         # 0) Get the strings to handle (prev_label and new_label)
         # 1) Load all labels of the csv
@@ -158,7 +159,6 @@ class WorkspaceCsv(Workspace):
         for i, label in enumerate(self.hidden_activities_labels):
             if label == prev_label:
                 self.hidden_activities_labels[i] = new_label
-
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Activity"]):
             split_string = string.split(",")
@@ -184,7 +184,6 @@ class WorkspaceCsv(Workspace):
         for i, label in enumerate(self.hidden_involved_people_labels):
             if label == prev_label:
                 self.hidden_involved_people_labels[i] = new_label
-
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Involved People"]):
             if str(string) != "nan":
@@ -391,6 +390,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.item_model_visible_acts = QtGui.QStandardItemModel()
         self.item_model_hidden_people = QtGui.QStandardItemModel()
         self.item_model_visible_people = QtGui.QStandardItemModel()
+        # self.flag_want_replace_label = False # Flag for confirm user wants to replace a label for other
 
         # ---------------------------------------------------------- Store layouts of the tabs that contains the graphs
         self.graph_layouts_list.append(None)
@@ -473,15 +473,25 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.setEnabledSelectionCalendarButtons(False)
 
         # ----------------------------------------------------- Set the list's models
+        self.item_model_hidden_acts.setObjectName("item_model_hidden_acts")
+        self.item_model_visible_acts.setObjectName("item_model_visible_acts")
+        self.item_model_hidden_people.setObjectName("item_model_hidden_people")
+        self.item_model_visible_people.setObjectName("item_model_visible_people")
+
         self.visible_acts_list.setModel(self.item_model_visible_acts)
         self.visible_people_list.setModel(self.item_model_visible_people)
         self.hidden_acts_list.setModel(self.item_model_hidden_acts)
         self.hidden_people_list.setModel(self.item_model_hidden_people)
 
-        self.item_model_visible_acts.itemChanged.connect(self.actsItemChanged)
-        self.item_model_visible_people.itemChanged.connect(self.peopleItemChanged)
-        self.item_model_hidden_acts.itemChanged.connect(self.actsItemChanged)
-        self.item_model_hidden_people.itemChanged.connect(self.peopleItemChanged)
+        # self.item_model_visible_acts.itemChanged.connect(self.actsItemChanged)
+        # self.item_model_visible_people.itemChanged.connect(self.peopleItemChanged)
+        # self.item_model_hidden_acts.itemChanged.connect(self.actsItemChanged)
+        # self.item_model_hidden_people.itemChanged.connect(self.peopleItemChanged)
+
+        self.item_model_visible_acts.itemChanged.connect(self.showWarningMsgReplaceLabel)
+        self.item_model_visible_people.itemChanged.connect(self.showWarningMsgReplaceLabel)
+        self.item_model_hidden_acts.itemChanged.connect(self.showWarningMsgReplaceLabel)
+        self.item_model_hidden_people.itemChanged.connect(self.showWarningMsgReplaceLabel)
 
         # --------------------------------------------------- Set activity and people labels filters functionality
         for button in [self.button_hide_act, self.button_visible_act, self.button_visible_people, self.button_hide_people]:
@@ -497,27 +507,30 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
 
-    def actsItemChanged(self, item):
+    def actsItemChanged(self, prev_label, new_label):
         # It take the previously item selected and change it for the new item
-        self.workspace.changeActLabel(self.current_item_selected, item.text())
+        self.workspace.changeActLabel(prev_label, new_label)
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
         self.loadTable(self.workspace.dataset)
         self.current_item_selected = ""
 
-    def peopleItemChanged(self, item):
-        self.workspace.changePeopleLabel(self.current_item_selected, item.text())
+    def peopleItemChanged(self, prev_label, new_label):
+        self.workspace.changePeopleLabel(prev_label, new_label)
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
         self.loadTable(self.workspace.dataset)
         self.current_item_selected = ""
-    
-    # def hiddenActsItemChanged(self, item):
-    #     pass
 
-    # def hiddenPeopleItemChanged(self, item):
-    #     pass
+    # def showWarningMsgReplaceLabel(self, prev_label, new_label):
+    def showWarningMsgReplaceLabel(self, item):
+        print("showWarningMsgReplaceLabel")
+        # Bug: When a label is changed and we want change other of the same list the function "showWarningMsgReplaceLabel" not works
+        prev_label = self.current_item_selected
+        new_label = item.text()
+        warning_msg = WarningMsgReplaceLabel(item.model().objectName(), prev_label, new_label, self)
+        warning_msg.exec_()
 
     def hideAct(self):
-        for index in self.visible_acts_list.selectedIndexes(): # This dloop has a bug
+        for index in self.visible_acts_list.selectedIndexes(): # This loop has a bug
             item = self.visible_acts_list.model().itemFromIndex(index)
             self.hidden_acts_list.model().appendRow(QtGui.QStandardItem(item.text()))
             self.workspace.visible_activities_labels.remove(item.text())
@@ -526,7 +539,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.visible_acts_list.selectionModel().clearSelection() # Here it's the bug, it's triggering some event which calls eventFilter
         self.workspace.filterActivitiesLabels()
         self.loadTable(self.workspace.dataset)
-     
+
     def visibleAct(self):
         for index in self.hidden_acts_list.selectedIndexes():
             item = self.hidden_acts_list.model().itemFromIndex(index)
@@ -563,6 +576,18 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.workspace.filterPeopleLabels()
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
         self.loadTable(self.workspace.dataset)
+
+    def hideAllActs(self):
+        pass
+
+    def visibleAllActs(self):
+        pass
+
+    def hideAllPeople(self):
+        pass
+
+    def visibleAllPeople(self):
+        pass
 
     def itemSelectedVisibleActs(self):
         # print("itemSelectedVisibleActs")
@@ -663,7 +688,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         for i in self.workspace.visible_activities_labels:
             item = QtGui.QStandardItem(i)
             self.item_model_visible_acts.appendRow(item)
-    
+
     def loadHiddenActsTable(self):
         self.item_model_hidden_acts.clear()
         for i in self.workspace.hidden_activities_labels:
@@ -848,6 +873,49 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def closeEvent(self, event):
         self.saveLastWorkspaceUsed()
+
+class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
+    def __init__(self, name_model_list, prev_label = "", new_label = "", parent = None):
+        self.parent = parent
+        super().__init__(self.parent)
+        self.setupUi(self)
+        self.prev_label = prev_label
+        self.new_label = new_label
+        self.setLabelsToReplace()
+        self.name_model_list = name_model_list
+
+    def accept(self):
+        if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
+            self.parent.actsItemChanged(self.prev_label, self.new_label)
+        elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
+            self.parent.peopleItemChanged(self.prev_label, self.new_label)
+        self.destroy()
+
+    def reject(self):
+        self.destroy()
+
+    def setLabelsToReplace(self, prev_label = None, new_label = None):
+        if prev_label != None:
+            self.prev_label = prev_label
+        if new_label != None:
+            self.new_label = new_label
+        string = 'Are you sure you want replace all "' + self.prev_label + '" labels by "' + self.new_label + '"?'
+        font = QtGui.QFont()
+        font.setPixelSize(13)
+        self.label_warning_replace = QtWidgets.QLabel(self)
+        self.label_warning_replace.setFont(font)
+        string_width = self.label_warning_replace.fontMetrics().boundingRect(string).width()
+        self.label_warning_replace.setText(string)
+        self.label_warning_replace.setMinimumWidth(string_width)
+        self.setMinimumWidth(string_width + 20)
+        self.label_warning_replace.move(10, 5)
+        self.label_warning_replace.show()
+
+        # self.label = QtWidgets.QLabel('Are you sure you want replace "' + prev_label + '" by "' + new_label + '" in all records?')
+        # self.label = QtWidgets.QLabel(self)
+        # self.label.setText("Hello")
+        # self.label.
+        # self.
 
 if __name__ == "__main__":
     import sys
