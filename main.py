@@ -40,6 +40,7 @@ class WorkspaceCsv(Workspace):
         self.final_date = dt.date(2000, 1, 1)
 
     def loadDataset(self):
+        # Load dataset from csv file
         if os.path.exists(self.path_csv) == False:
             file = open(self.path_csv, "w")
             file.write("Date" + self.sep + "Activity" + self.sep + "Details" + self.sep + "Time" + self.sep + "Involved People")
@@ -52,7 +53,6 @@ class WorkspaceCsv(Workspace):
             self.dataset[["Date"]] = self.dataset[["Date"]].apply(pd.to_datetime)
             self.dataset["Date"] = self.dataset["Date"].dt.date
             self.dataset = self.dataset.sort_values("Date")
-        # print(self.dataset)
 
     def setData(self, dataset): # Change name to "setDataStored"
         self.dataset = dataset
@@ -64,32 +64,37 @@ class WorkspaceCsv(Workspace):
 
     def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
-        self.loadDataset()
+        self.loadDataset() # Load dataset from csv file
 
         if len(self.dataset) > 0:
             if self.selected_date_option != "Custom period":
                 if self.selected_date_option == "Last month":
                     parent.setEnabledSelectionCalendarButtons(False)
                     included = self.dataset["Date"].map(lambda x: x.month) == dt.date.today().month
+
                 elif self.selected_date_option == "Last year":
                     parent.setEnabledSelectionCalendarButtons(False)
-                    included = self.dataset["Date"].map(lambda x: x.year) == 2020 # 2020 for test
+                    included = self.dataset["Date"].map(lambda x: x.year) == 2020 # 2020 for test because I don't have a prepared dataset with more years
+
                 elif self.selected_date_option == "Entire history":
                     parent.setEnabledSelectionCalendarButtons(False)
                     included = self.dataset["Date"].map(lambda x: x == x)
 
-                if len(self.dataset[included]) > 0:
+                if len(self.dataset[included]) > 0: # "included" is the selected data in previous ifs
                     self.initial_date = self.dataset[included].values[0][0]
                     self.final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
             else:
                 parent.setEnabledSelectionCalendarButtons(True)
                 included = self.dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
+            print("    len(dataset[included]): ", len(self.dataset[included]))
             self.dataset = self.dataset[included]
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
 
             # ---------------------------------------------------------------------------- Set previously labels activities
             hidden_activities = self.hidden_activities_labels
             hidden_people = self.hidden_involved_people_labels
+
+            # ---------------------------------------------------------------------------- 
             self.setActivitiesLabels()
             self.setInvolvedPeopleLabels()
 
@@ -161,7 +166,7 @@ class WorkspaceCsv(Workspace):
                 self.hidden_activities_labels[i] = new_label
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Activity"]):
-            split_string = string.split(",")
+            split_string = string.split(",") # Bug because there are a nan string
             new_string = ""
             j = 0
             while j < len(split_string) - 1:
@@ -309,10 +314,10 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         self.parent = parent
         self.fields_list = []
         self.normalized_fields_names = ["Date", "Activity", "Details", "Time", "Involved People"]
-        super().__init__()
+        super().__init__(self.parent)
         self.setupUi(self)
         self.import_button.clicked.connect(self.openCsv)
-        self.lineedit_directory.setEnabled(False)
+        self.lineedit_directory.setEnabled(False) # Entry box of the csv directory it's disable until click on "Examin" button
         self.directory = ""
         self.imported_dataset = None
         self.normalized_dataset = None
@@ -322,7 +327,6 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         self.lineedit_directory.setText(fname[0])
         self.directory = fname[0].replace("/", "\\")
         self.imported_dataset = pd.read_csv(self.directory, sep = ";")
-
         self.comboBox_date.addItems(self.imported_dataset.columns)
         self.comboBox_activity.addItems(self.imported_dataset.columns)
         self.comboBox_details.addItems(self.imported_dataset.columns)
@@ -339,10 +343,8 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
 
     def validate_duplicates_combobox(self):
         # If there are one field of the csv file for more than one field of the workspace returns true, else false
-        # functional requeriment: #4 - 2)
         for i in range(5):
             if self.fields_list.count(self.fields_list[i]) > 1:
-                print(self.fields_list.count(self.fields_list[i]))
                 return True
         return False
 
@@ -368,6 +370,50 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
     def reject(self):
         self.destroy()
 
+class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
+    def __init__(self, name_model_list, prev_label = "", new_label = "", parent = None):
+        self.parent = parent
+        super().__init__(self.parent)
+        self.setupUi(self)
+        self.prev_label = prev_label
+        self.new_label = new_label
+        self.setLabelsToReplace()
+        self.name_model_list = name_model_list
+        
+    def accept(self):
+        print("Accept: ", self.name_model_list)
+        if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
+            self.parent.actsItemChanged(self.prev_label, self.new_label)
+        elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
+            self.parent.peopleItemChanged(self.prev_label, self.new_label)
+        # self.label_warning_replace.destroy()
+        self.destroy()
+
+    def reject(self):
+        self.destroy()
+
+    def setLabelsToReplace(self, prev_label = None, new_label = None):
+        if prev_label != None:
+            self.prev_label = prev_label
+        if new_label != None:
+            self.new_label = new_label
+        string = 'Are you sure you want replace all "' + self.prev_label + '" labels by "' + self.new_label + '"?'
+        font = QtGui.QFont()
+        font.setPixelSize(13)
+        self.label_warning_replace = QtWidgets.QLabel(self)
+        self.label_warning_replace.setFont(font)
+        string_width = self.label_warning_replace.fontMetrics().boundingRect(string).width()
+        self.label_warning_replace.setText(string)
+        self.label_warning_replace.setMinimumWidth(string_width)
+        self.setMinimumWidth(string_width + 20)
+        self.label_warning_replace.move(10, 5)
+        self.label_warning_replace.show()
+
+        # self.label = QtWidgets.QLabel('Are you sure you want replace "' + prev_label + '" by "' + new_label + '" in all records?')
+        # self.label = QtWidgets.QLabel(self)
+        # self.label.setText("Hello")
+        # self.label.
+        # self.
 # --------------------------------------------------------------------------------------------------------------------------------------------------------
 class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
@@ -509,8 +555,10 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def actsItemChanged(self, prev_label, new_label):
         # It take the previously item selected and change it for the new item
+        print("actsItemChanged")
         self.workspace.changeActLabel(prev_label, new_label)
-        self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
+        print("    selected_date_option: ", self.workspace.selected_date_option)
+        self.workspace.setSelectedDate(self.workspace.selected_date_option, self) # Bug when window is closed after change a label TC10.2
         self.loadTable(self.workspace.dataset)
         self.current_item_selected = ""
 
@@ -522,7 +570,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     # def showWarningMsgReplaceLabel(self, prev_label, new_label):
     def showWarningMsgReplaceLabel(self, item):
-        print("showWarningMsgReplaceLabel")
         # Bug: When a label is changed and we want change other of the same list the function "showWarningMsgReplaceLabel" not works
         prev_label = self.current_item_selected
         new_label = item.text()
@@ -723,6 +770,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         import_csv.exec_()
 
     def eventFilter(self, obj, event):
+        print("eventFilter: ", event)
         if self.workspace != None:
             if event.type() == QtCore.QEvent.FocusIn: # If focus in widget
                 self.mousePressEvent(event)
@@ -767,7 +815,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                     list.selectionModel().clearSelection()
 
     def mousePressEvent(self, event):
-        # print("mouse pressed: ", event)
+        #print("mouse pressed: ", event)
         self.destroyCalendar()
 
     def newTab(self, event):
@@ -874,48 +922,48 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
     def closeEvent(self, event):
         self.saveLastWorkspaceUsed()
 
-class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
-    def __init__(self, name_model_list, prev_label = "", new_label = "", parent = None):
-        self.parent = parent
-        super().__init__(self.parent)
-        self.setupUi(self)
-        self.prev_label = prev_label
-        self.new_label = new_label
-        self.setLabelsToReplace()
-        self.name_model_list = name_model_list
+# class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
+#     def __init__(self, name_model_list, prev_label = "", new_label = "", parent = None):
+#         self.parent = parent
+#         super().__init__(self.parent)
+#         self.setupUi(self)
+#         self.prev_label = prev_label
+#         self.new_label = new_label
+#         self.setLabelsToReplace()
+#         self.name_model_list = name_model_list
+        
+#     def accept(self):
+#         if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
+#             self.parent.actsItemChanged(self.prev_label, self.new_label)
+#         elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
+#             self.parent.peopleItemChanged(self.prev_label, self.new_label)
+#         self.destroy()
 
-    def accept(self):
-        if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
-            self.parent.actsItemChanged(self.prev_label, self.new_label)
-        elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
-            self.parent.peopleItemChanged(self.prev_label, self.new_label)
-        self.destroy()
+#     def reject(self):
+#         self.destroy()
 
-    def reject(self):
-        self.destroy()
+#     def setLabelsToReplace(self, prev_label = None, new_label = None):
+#         if prev_label != None:
+#             self.prev_label = prev_label
+#         if new_label != None:
+#             self.new_label = new_label
+#         string = 'Are you sure you want replace all "' + self.prev_label + '" labels by "' + self.new_label + '"?'
+#         font = QtGui.QFont()
+#         font.setPixelSize(13)
+#         self.label_warning_replace = QtWidgets.QLabel(self)
+#         self.label_warning_replace.setFont(font)
+#         string_width = self.label_warning_replace.fontMetrics().boundingRect(string).width()
+#         self.label_warning_replace.setText(string)
+#         self.label_warning_replace.setMinimumWidth(string_width)
+#         self.setMinimumWidth(string_width + 20)
+#         self.label_warning_replace.move(10, 5)
+#         self.label_warning_replace.show()
 
-    def setLabelsToReplace(self, prev_label = None, new_label = None):
-        if prev_label != None:
-            self.prev_label = prev_label
-        if new_label != None:
-            self.new_label = new_label
-        string = 'Are you sure you want replace all "' + self.prev_label + '" labels by "' + self.new_label + '"?'
-        font = QtGui.QFont()
-        font.setPixelSize(13)
-        self.label_warning_replace = QtWidgets.QLabel(self)
-        self.label_warning_replace.setFont(font)
-        string_width = self.label_warning_replace.fontMetrics().boundingRect(string).width()
-        self.label_warning_replace.setText(string)
-        self.label_warning_replace.setMinimumWidth(string_width)
-        self.setMinimumWidth(string_width + 20)
-        self.label_warning_replace.move(10, 5)
-        self.label_warning_replace.show()
-
-        # self.label = QtWidgets.QLabel('Are you sure you want replace "' + prev_label + '" by "' + new_label + '" in all records?')
-        # self.label = QtWidgets.QLabel(self)
-        # self.label.setText("Hello")
-        # self.label.
-        # self.
+#         # self.label = QtWidgets.QLabel('Are you sure you want replace "' + prev_label + '" by "' + new_label + '" in all records?')
+#         # self.label = QtWidgets.QLabel(self)
+#         # self.label.setText("Hello")
+#         # self.label.
+#         # self.
 
 if __name__ == "__main__":
     import sys

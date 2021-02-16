@@ -80,12 +80,12 @@ class Ui_ImportCsv(object):
         self.label_involved_people.setText(_translate("ImportCsv", "Involved People:"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    ImportCsv = QtWidgets.QDialog()
-    ui = Ui_ImportCsv()
-    ui.setupUi(ImportCsv)
-    ImportCsv.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     ImportCsv = QtWidgets.QDialog()
+#     ui = Ui_ImportCsv()
+#     ui.setupUi(ImportCsv)
+#     ImportCsv.show()
+#     sys.exit(app.exec_())
 
