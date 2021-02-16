@@ -363,6 +363,7 @@ background-color: rgb(29, 29, 29);</string>
     <string>Workspace name:</string>
    </property>
   </widget>
+
  </widget>
  <resources/>
  <connections>

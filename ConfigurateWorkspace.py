@@ -114,7 +114,6 @@ class Ui_ConfigurateWorkspace(object):
         self.label_workspace_name = QtWidgets.QLabel(ConfigurateWorkspace)
         self.label_workspace_name.setGeometry(QtCore.QRect(16, 12, 89, 16))
         self.label_workspace_name.setObjectName("label_workspace_name")
-
         self.retranslateUi(ConfigurateWorkspace)
         self.dialog_buttons.accepted.connect(ConfigurateWorkspace.accept)
         self.dialog_buttons.rejected.connect(ConfigurateWorkspace.reject)
@@ -132,7 +131,6 @@ class Ui_ConfigurateWorkspace(object):
         self.label_user.setText(_translate("ConfigurateWorkspace", "User:"))
         self.label_password.setText(_translate("ConfigurateWorkspace", "Password:"))
         self.label_workspace_name.setText(_translate("ConfigurateWorkspace", "Workspace name:"))
-
 
 if __name__ == "__main__":
     import sys

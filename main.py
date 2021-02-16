@@ -221,6 +221,7 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.checkbox_database.clicked.connect(self.databaseClicked)
         self.examin_button.clicked.connect(self.selectCsvDirectory)
 
+
     def csvClicked(self):
         if self.checkbox_csv.checkState() == 2:
             if self.checkbox_database.checkState() == 2:
@@ -251,6 +252,7 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.lineedit_user.setEnabled(state)
 
     def accept(self):
+
         # ----------------------------------------- Set csv workspace
         if self.checkbox_csv.checkState() == 2:
             directory = self.lineedit_csv.text()
@@ -267,9 +269,11 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         # ---------------------------------------- Destroy QDialog
         self.destroy()
 
+
     def reject(self):
         print("Reject")
         self.destroy()
+
 
     def selectCsvDirectory(self):
         directory_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory")
@@ -307,6 +311,7 @@ class NewGraphWin(QtWidgets.QDialog, Ui_new_graph_win):
     def accept(self):
         self.parent.createLinearGraph()
         self.destroy()
+
 
 # -------------------------------------------------------------------------------
 class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
@@ -419,11 +424,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
         super().__init__()
         self.selected_date_options = ["Last year", "Last month", "Entire history", "Custom period"]
+
         self.setupUi(self)
         # ---------------------------------------------------------- Set the configuration of the tabs
         self.tabs.tabBarClicked.connect(self.newTab)
         self.setClosableTabs()
         self.tabs.tabCloseRequested.connect(self.closeTab)
+
         self.current_item_selected = "" # When an item it's selected in a QListView widget
 
         # ---------------------------------------------------------- Instance attributes
@@ -442,12 +449,14 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.graph_layouts_list.append(None)
         self.graph_layouts_list.append(self.graph_layout)
 
+
         # ----------------------------------------------------------- Set calendar buttons function
         self.button_date_from.clicked.connect(self.showCalendar)
         self.button_date_to.clicked.connect(self.showCalendar)
         self.button_date_selected.clicked.connect(self.showCalendar)
 
         # ----------------------------------------------------------- Set the Event Filter for the widgets
+
         # ------------------------------------ Section "Configurate Selection"
         self.combo_box_ops_date.installEventFilter(self)
         self.combo_box_ops_time.installEventFilter(self)
@@ -499,10 +508,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.add_involved_people_button.installEventFilter(self)
         self.update_involved_people_button.installEventFilter(self)
         self.remove_involved_people_button.installEventFilter(self)
+        
         self.new_button.installEventFilter(self)
         self.update_button.installEventFilter(self)
         self.unselect_button.installEventFilter(self)
         self.delete_button.installEventFilter(self)
+
 
         # ------------------------------------ Other sections
         self.table1.installEventFilter(self)
@@ -836,7 +847,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.tabs.setCurrentIndex(0)
 
     def createNewTab(self):
-        tab = QtWidgets.QWidget()
+
+        tab = QtWidgets.QWidget()      
+
         self.tabs.insertTab(self.tabs.count(), tab, "+")
         self.setClosableTabs()
 
@@ -876,17 +889,20 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.calendar.setStyleSheet("background-color: rgb(45, 45, 45);\ncolor: rgb(200, 200, 200);\nalternate-background-color: rgb(85, 85, 127);\ngridline-color: rgb(255, 255, 255);")
             self.calendar.setGridVisible(True)
             self.calendar.setFirstDayOfWeek(QtCore.Qt.Monday)
+
             # ------------------------------------------------------ Set actual date
             if self.calendar_btn.objectName() == "button_date_from":
                 d = self.workspace.initial_date
             elif self.calendar_btn.objectName() == "button_date_to":
                 d = self.workspace.final_date
             self.calendar.setSelectedDate(QtCore.QDate(d.year, d.month, d.day))
+
             self.calendar.show()
             self.calendar.clicked.connect(self.clickCalendar)
 
     def clickCalendar(self, date):
         btn_name = self.calendar_btn.objectName()
+
         d = dt.date(date.year(), date.month(), date.day())
         # ------------------------------------------ Set date
         if btn_name != "button_date_selected":
@@ -900,11 +916,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             print("Load table")
             self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
             self.loadTable(self.workspace.dataset)
+
         else:
             self.date_selected.setDate(date)
         self.destroyCalendar()
 
     def destroyCalendar(self):
+
         if self.calendar != None:
             self.calendar.hide()
             self.calendar.destroy()
