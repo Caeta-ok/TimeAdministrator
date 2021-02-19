@@ -93,8 +93,6 @@ class WorkspaceCsv(Workspace):
             # ---------------------------------------------------------------------------- Set previously labels activities
             hidden_activities = self.hidden_activities_labels
             hidden_people = self.hidden_involved_people_labels
-
-            # ---------------------------------------------------------------------------- 
             self.setActivitiesLabels()
             self.setInvolvedPeopleLabels()
 
@@ -105,7 +103,6 @@ class WorkspaceCsv(Workspace):
             for label in self.visible_involved_people_labels:
                 if label in hidden_people:
                     self.visible_involved_people_labels.remove(label)
-
             self.filterPeopleLabels()
             self.filterActivitiesLabels()
 
@@ -221,7 +218,6 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.checkbox_database.clicked.connect(self.databaseClicked)
         self.examin_button.clicked.connect(self.selectCsvDirectory)
 
-
     def csvClicked(self):
         if self.checkbox_csv.checkState() == 2:
             if self.checkbox_database.checkState() == 2:
@@ -252,7 +248,6 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.lineedit_user.setEnabled(state)
 
     def accept(self):
-
         # ----------------------------------------- Set csv workspace
         if self.checkbox_csv.checkState() == 2:
             directory = self.lineedit_csv.text()
@@ -269,11 +264,9 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         # ---------------------------------------- Destroy QDialog
         self.destroy()
 
-
     def reject(self):
         print("Reject")
         self.destroy()
-
 
     def selectCsvDirectory(self):
         directory_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory")
@@ -311,7 +304,6 @@ class NewGraphWin(QtWidgets.QDialog, Ui_new_graph_win):
     def accept(self):
         self.parent.createLinearGraph()
         self.destroy()
-
 
 # -------------------------------------------------------------------------------
 class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
@@ -383,7 +375,7 @@ class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
         self.prev_label = prev_label
         self.new_label = new_label
         self.setLabelsToReplace()
-        self.name_model_list = name_model_list
+        self.name_model_list = name_model_list # Name of the list the label is in
         
     def accept(self):
         print("Accept: ", self.name_model_list)
@@ -391,7 +383,6 @@ class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
             self.parent.actsItemChanged(self.prev_label, self.new_label)
         elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
             self.parent.peopleItemChanged(self.prev_label, self.new_label)
-        # self.label_warning_replace.destroy()
         self.destroy()
 
     def reject(self):
@@ -564,11 +555,10 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
 
-    def actsItemChanged(self, prev_label, new_label):
+    def actsItemChanged(self, prev_label, new_label = ""):
+    # def actsItemChanged(self, item):
         # It take the previously item selected and change it for the new item
-        print("actsItemChanged")
         self.workspace.changeActLabel(prev_label, new_label)
-        print("    selected_date_option: ", self.workspace.selected_date_option)
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self) # Bug when window is closed after change a label TC10.2
         self.loadTable(self.workspace.dataset)
         self.current_item_selected = ""
@@ -585,7 +575,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         prev_label = self.current_item_selected
         new_label = item.text()
         warning_msg = WarningMsgReplaceLabel(item.model().objectName(), prev_label, new_label, self)
-        warning_msg.exec_()
+        warning_msg.show()
 
     def hideAct(self):
         for index in self.visible_acts_list.selectedIndexes(): # This loop has a bug
@@ -781,7 +771,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         import_csv.exec_()
 
     def eventFilter(self, obj, event):
-        print("eventFilter: ", event)
         if self.workspace != None:
             if event.type() == QtCore.QEvent.FocusIn: # If focus in widget
                 self.mousePressEvent(event)
@@ -939,49 +928,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def closeEvent(self, event):
         self.saveLastWorkspaceUsed()
-
-# class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
-#     def __init__(self, name_model_list, prev_label = "", new_label = "", parent = None):
-#         self.parent = parent
-#         super().__init__(self.parent)
-#         self.setupUi(self)
-#         self.prev_label = prev_label
-#         self.new_label = new_label
-#         self.setLabelsToReplace()
-#         self.name_model_list = name_model_list
-        
-#     def accept(self):
-#         if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
-#             self.parent.actsItemChanged(self.prev_label, self.new_label)
-#         elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
-#             self.parent.peopleItemChanged(self.prev_label, self.new_label)
-#         self.destroy()
-
-#     def reject(self):
-#         self.destroy()
-
-#     def setLabelsToReplace(self, prev_label = None, new_label = None):
-#         if prev_label != None:
-#             self.prev_label = prev_label
-#         if new_label != None:
-#             self.new_label = new_label
-#         string = 'Are you sure you want replace all "' + self.prev_label + '" labels by "' + self.new_label + '"?'
-#         font = QtGui.QFont()
-#         font.setPixelSize(13)
-#         self.label_warning_replace = QtWidgets.QLabel(self)
-#         self.label_warning_replace.setFont(font)
-#         string_width = self.label_warning_replace.fontMetrics().boundingRect(string).width()
-#         self.label_warning_replace.setText(string)
-#         self.label_warning_replace.setMinimumWidth(string_width)
-#         self.setMinimumWidth(string_width + 20)
-#         self.label_warning_replace.move(10, 5)
-#         self.label_warning_replace.show()
-
-#         # self.label = QtWidgets.QLabel('Are you sure you want replace "' + prev_label + '" by "' + new_label + '" in all records?')
-#         # self.label = QtWidgets.QLabel(self)
-#         # self.label.setText("Hello")
-#         # self.label.
-#         # self.
 
 if __name__ == "__main__":
     import sys
