@@ -470,6 +470,8 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.button_hide_people.installEventFilter(self)
         self.button_visible_people.installEventFilter(self)
 
+        # self.button_hide_act.clicked.connect(self.hideAct())
+
         # Time -----------------------------
         self.spin_hours_2.installEventFilter(self)
         self.spin_min_2.installEventFilter(self)
@@ -504,7 +506,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.update_button.installEventFilter(self)
         self.unselect_button.installEventFilter(self)
         self.delete_button.installEventFilter(self)
-
 
         # ------------------------------------ Other sections
         self.table1.installEventFilter(self)
@@ -579,11 +580,13 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def hideAct(self):
         for index in self.visible_acts_list.selectedIndexes(): # This loop has a bug
+            print("for hideAct")
             item = self.visible_acts_list.model().itemFromIndex(index)
             self.hidden_acts_list.model().appendRow(QtGui.QStandardItem(item.text()))
             self.workspace.visible_activities_labels.remove(item.text())
             self.workspace.hidden_activities_labels.append(item.text())
             self.visible_acts_list.model().removeRow(item.row())
+        print("hideAct")
         self.visible_acts_list.selectionModel().clearSelection() # Here it's the bug, it's triggering some event which calls eventFilter
         self.workspace.filterActivitiesLabels()
         self.loadTable(self.workspace.dataset)
@@ -768,15 +771,18 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def importCsv(self):
         import_csv = ImportCsv(self)
-        import_csv.exec_()
+        # import_csv.exec_()
+        import_csv.show()
 
     def eventFilter(self, obj, event):
+        # print("event: ", event, " | obj: ", obj)
         if self.workspace != None:
             if event.type() == QtCore.QEvent.FocusIn: # If focus in widget
                 self.mousePressEvent(event)
                 if type(obj) == type(QtWidgets.QPushButton()): # If button it's one of the label filters
                     btn_name = obj.objectName()
                     if btn_name == "button_hide_act":
+                        # print("hide_act")
                         self.hideAct()
                     elif btn_name == "button_visible_act":
                         self.visibleAct()
@@ -787,13 +793,14 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                 else: # If it's not a button
                     self.unselectListViewItems(obj)
 
-            elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()): # If it's list or menubar
+            elif type(obj) == type(QtWidgets.QListView()):
+            # elif type(obj) == type(QtWidgets.QListView()) or type(obj) == type(QtWidgets.QMenuBar()): # If it's list or menubar
                 if event.type() == QtCore.QEvent.MouseButtonPress: # If it was clicked
                     self.mousePressEvent(event)
-                # if obj.objectName() == "visible_acts_list":
-                    # print("obj: ", obj.objectName(), " | event: ", event)
-                    # if type(event) == type(QtGui.QKeyEvent(QtGui.QEvent(), 1)):
-                        # print("event key: ", event.values)
+
+            elif type(obj) == type(QtWidgets.QMenuBar()):
+                if event.type() == 2: # MouseButtonPress event
+                    self.unselectListViewItems(obj)
 
             elif type(obj) == type(QtWidgets.QComboBox()): # If type widget it's combo box
                 if obj.objectName() == "combo_box_ops_date": # If date selection combo box its clicked
@@ -801,6 +808,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                         if obj.currentText() != self.workspace.selected_date_option: # If option was changed
                             self.workspace.setSelectedDate(obj.currentText(), self)
                             self.loadTable(self.workspace.dataset)
+
         return super().eventFilter(obj, event)
 
     def unselectListViewItems(self, obj):
@@ -815,14 +823,16 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                     list.selectionModel().clearSelection()
 
     def mousePressEvent(self, event):
-        #print("mouse pressed: ", event)
+        # print("mouse pressed: ", event)
+        # self.visible_acts_list.clearSelection()
         self.destroyCalendar()
 
     def newTab(self, event):
         self.destroyCalendar()
         if event == self.tabs.count() - 1:
             new_graph = NewGraphWin(self)
-            new_graph.exec_()
+            # new_graph.exec_()
+            new_graph.show()
 
     def setClosableTabs(self):
         self.tabs.setTabsClosable(False)
@@ -919,7 +929,8 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def newWorkspace(self):
         new_workspace_win = ConfigurateWorkspace(self)
-        new_workspace_win.exec_()
+        # new_workspace_win.exec_()
+        new_workspace_win.show()
 
     def saveLastWorkspaceUsed(self):
         file = open("last.txt", "w")
