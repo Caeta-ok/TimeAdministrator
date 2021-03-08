@@ -153,33 +153,43 @@ class WorkspaceCsv(Workspace):
                     self.dataset.drop([i], axis = 0, inplace = True)
             self.dataset.index = pd.RangeIndex(0, len(self.dataset))
 
+    def removeRecord(self, dataset, index):
+        print("removeRecord")
+        dataset.drop([index], axis = 0, inplace = True)
+        dataset = dataset.reset_index(drop = True)
+
     def changeActLabel(self, prev_label, new_label):
-        # 0) Get the strings to handle (prev_label and new_label)
-        # 1) Load all labels of the csv
-        # 2) Replace all substrings which contains the label
-        # 3) Reload dataset
-        for i, label in enumerate(self.hidden_activities_labels):
+        # Change the previous label for the new label in the hidden activities
+        for i, label in enumerate(self.hidden_activities_labels): 
             if label == prev_label:
                 self.hidden_activities_labels[i] = new_label
+        
+        # Get records from the csv file of the workspace
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Activity"]):
             split_string = string.split(",") # Bug because there are a nan string
             new_string = ""
             j = 0
-            while j < len(split_string) - 1:
-                if split_string[j] == prev_label:
-                    new_string += new_label + ","
+            # If new_label has no any character and if split_string has only 1 element remove the record that contains the modified label
+            if len(split_string) == 1 and new_label == "":
+                if split_string[0] == prev_label:
+                    self.removeRecord(dataset, i)
+            else: # If no, iterate on all elements of split_string and replace the string which = prev_label for new_label
+                while j < len(split_string) - 1:
+                    if split_string[j] == prev_label:
+                        if new_label != "": # If label was not deleted
+                            new_string += new_label + ","
+                    else:
+                        new_string += split_string[j] + ","
+                    j += 1
+                # ----------------------------------------------------- In last label comma is not write
+                if split_string[len(split_string) - 1] == prev_label:
+                    new_string += new_label
                 else:
-                    new_string += split_string[j] + ","
-                j += 1
-            # ----------------------------------------------------- In last label comma is not write
-            if split_string[len(split_string) - 1] == prev_label:
-                new_string += new_label
-            else:
-                new_string += split_string[len(split_string) - 1]
-            dataset.loc[i, "Activity"] = new_string
-        dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
-        dataset = dataset.set_index("Date")
+                    new_string += split_string[len(split_string) - 1]
+                dataset.loc[i, "Activity"] = new_string # Add the modified string to the dataframe
+        dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d") # Convert data from "Date" column to datetime type 
+        dataset = dataset.set_index("Date") # Set the column "Date" as index. This avoids that a new column with int values has be added
         dataset.to_csv(self.path_csv, sep = ";")
 
     def changePeopleLabel(self, prev_label, new_label):
@@ -378,7 +388,6 @@ class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
         self.name_model_list = name_model_list # Name of the list the label is in
         
     def accept(self):
-        print("Accept: ", self.name_model_list)
         if self.name_model_list == "item_model_visible_acts" or self.name_model_list == "item_model_hidden_acts":
             self.parent.actsItemChanged(self.prev_label, self.new_label)
         elif self.name_model_list == "item_model_visible_people" or self.name_model_list == "item_model_hidden_people":
