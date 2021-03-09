@@ -942,9 +942,10 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         new_workspace_win.show()
 
     def saveLastWorkspaceUsed(self):
-        file = open("last.txt", "w")
-        file.write(self.workspace.directory + "\\" + self.workspace.name)
-        file.close()
+        if self.workspace != None:
+            file = open("last.txt", "w")
+            file.write(self.workspace.directory + "\\" + self.workspace.name)
+            file.close()
 
     def closeEvent(self, event):
         self.saveLastWorkspaceUsed()
