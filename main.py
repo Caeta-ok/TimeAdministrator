@@ -334,23 +334,47 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         self.lineedit_directory.setText(fname[0])
         self.directory = fname[0].replace("/", "\\")
         self.imported_dataset = pd.read_csv(self.directory, sep = ";")
+
+        # Clean all combobox items for prevent fields from multiplying 
+        self.comboBox_date.clear()
+        self.comboBox_activity.clear()
+        self.comboBox_details.clear()
+        self.comboBox_time.clear()
+        self.comboBox_involved_people.clear()
+
+        # Fill all comboboxes
         self.comboBox_date.addItems(self.imported_dataset.columns)
         self.comboBox_activity.addItems(self.imported_dataset.columns)
         self.comboBox_details.addItems(self.imported_dataset.columns)
         self.comboBox_time.addItems(self.imported_dataset.columns)
         self.comboBox_involved_people.addItems(self.imported_dataset.columns)
 
+        # Add the "No field"
+        self.comboBox_date.addItem("No field")
+        self.comboBox_activity.addItem("No field")
+        self.comboBox_details.addItem("No field")
+        self.comboBox_time.addItem("No field")
+        self.comboBox_involved_people.addItem("No field")
+
     def gatherFields(self):
         self.fields_list = []
-        self.fields_list.append(self.comboBox_date.currentText())
-        self.fields_list.append(self.comboBox_activity.currentText())
-        self.fields_list.append(self.comboBox_details.currentText())
-        self.fields_list.append(self.comboBox_time.currentText())
-        self.fields_list.append(self.comboBox_involved_people.currentText())
+        for i, combo in enumerate([self.comboBox_date, self.comboBox_activity, self.comboBox_details, self.comboBox_time, self.comboBox_involved_people]):
+            text = combo.currentText()
+            if text != "No field":
+                self.fields_list.append(text)
+            else:
+                self.normalized_fields_names.remove(self.normalized_fields_names[i]) 
+         
+        # self.fields_list.append(self.comboBox_date.currentText())
+        # self.fields_list.append(self.comboBox_activity.currentText())
+        # self.fields_list.append(self.comboBox_details.currentText())
+        # self.fields_list.append(self.comboBox_time.currentText())
+        # self.fields_list.append(self.comboBox_involved_people.currentText())
 
     def validate_duplicates_combobox(self):
         # If there are one field of the csv file for more than one field of the workspace returns true, else false
-        for i in range(5):
+        # for i in range(5):
+        for i in range(len(self.fields_list)):
             if self.fields_list.count(self.fields_list[i]) > 1:
                 return True
         return False
@@ -715,7 +739,8 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         rows_num = len(dataset)
         cols_num = self.table1.columnCount()
         values = dataset.values
-
+        print("dataset")
+        print(dataset)
         if rows_num > 100: # If there are more rows than 100 (default number)
             self.table1.setRowCount(rows_num)
         elif rows_num < 100:
@@ -728,7 +753,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                     self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(""))
 
         for i in range(rows_num):
-            for j in range(cols_num):
+            for j in range(cols_num): #
                 self.table1.setItem(i, j, QtWidgets.QTableWidgetItem(str(values[i][j])))
 
         # -------------------------------------------------------------- Set date in the QDateEdit widgets
