@@ -589,9 +589,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
 
-        self.table1.selectionModel().selectionChanged.connect(self.recordSelected)
+        self.table1.selectionModel().selectionChanged.connect(self.selectRecord)
 
-    def recordSelected(self):
+    def selectRecord(self):
         # Load al data of the selected record in the widgets of the Manager Register
         item_selected = self.table1.selectionModel().selectedRows()
         for i in item_selected:
@@ -601,12 +601,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             details = self.workspace.dataset["Details"][row]
             time = self.workspace.dataset["Time"][row]
             people = self.workspace.dataset["Involved People"][row]
-
-            print("date: ", date)
-            print("activity: ", activity)
-            print("details: ", details)
-            print("time: ", time)
-            print("involved people: ", people)
 
             # Set date in the QDateEdit widget
             self.date_selected.setDate(QtCore.QDate(date.year, date.month, date.day))
@@ -640,8 +634,16 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                     people_model.appendRow(QtGui.QStandardItem(people[i]))
                 self.involved_people_list.setModel(people_model)
 
-
-
+    def unselectRecord(self):
+        self.date_selected.setDate(QtCore.QDate(2000, 1, 1))
+        self.spin_hours.setValue(0)
+        self.spin_min.setValue(0)
+        self.spin_sec.setValue(0)
+        
+        self.activities_list.model().clear()
+        self.details_list.model().clear()
+        self.involved_people_list.model().clear()
+        
     def actsItemChanged(self, prev_label, new_label = ""):
     # def actsItemChanged(self, item):
         # It take the previously item selected and change it for the new item
@@ -898,6 +900,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                 if type(event) == QtGui.QKeyEvent:
                     if event.key() == 16777216: # Escape key
                         self.table1.clearSelection()
+                        self.unselectRecord()
 
         return super().eventFilter(obj, event)
 
