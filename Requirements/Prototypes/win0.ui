@@ -49,6 +49,11 @@ color: rgb(171, 171, 171);</string>
         <height>739</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <kerning>true</kerning>
+       </font>
+      </property>
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
       </property>
@@ -58,6 +63,9 @@ border-color: rgb(47, 47, 47);
 gridline-color: rgb(255, 255, 255);
 color: rgb(100, 100, 100);
 gridline-color: rgb(40, 40, 40);</string>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
       </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::SingleSelection</enum>
@@ -865,80 +873,6 @@ image: url(:/calendarIcon/calendar2.jpg);</string>
        </property>
        <property name="text">
         <string>To</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="edit_label_line_edit">
-       <property name="geometry">
-        <rect>
-         <x>574</x>
-         <y>201</y>
-         <width>140</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(65, 65, 65);</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="remove_edit_label_button">
-       <property name="geometry">
-        <rect>
-         <x>671</x>
-         <y>232</y>
-         <width>45</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(65, 65, 65);</string>
-       </property>
-       <property name="text">
-        <string>Remove</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="update_edit_label_button">
-       <property name="geometry">
-        <rect>
-         <x>617</x>
-         <y>232</y>
-         <width>45</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(65, 65, 65);</string>
-       </property>
-       <property name="text">
-        <string>Update</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="add_edit_label_button">
-       <property name="geometry">
-        <rect>
-         <x>575</x>
-         <y>232</y>
-         <width>33</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(65, 65, 65);</string>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="edit_label">
-       <property name="geometry">
-        <rect>
-         <x>621</x>
-         <y>182</y>
-         <width>48</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Edit Label</string>
        </property>
       </widget>
      </widget>

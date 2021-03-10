@@ -350,27 +350,27 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
         self.comboBox_involved_people.addItems(self.imported_dataset.columns)
 
         # Add the "No field"
-        self.comboBox_date.addItem("No field")
-        self.comboBox_activity.addItem("No field")
-        self.comboBox_details.addItem("No field")
-        self.comboBox_time.addItem("No field")
-        self.comboBox_involved_people.addItem("No field")
+        # self.comboBox_date.addItem("No field")
+        # self.comboBox_activity.addItem("No field")
+        # self.comboBox_details.addItem("No field")
+        # self.comboBox_time.addItem("No field")
+        # self.comboBox_involved_people.addItem("No field")
 
     def gatherFields(self):
         self.fields_list = []
-        for i, combo in enumerate([self.comboBox_date, self.comboBox_activity, self.comboBox_details, self.comboBox_time, self.comboBox_involved_people]):
-            text = combo.currentText()
-            if text != "No field":
-                self.fields_list.append(text)
-            else:
-                self.normalized_fields_names.remove(self.normalized_fields_names[i]) 
-         
-        # self.fields_list.append(self.comboBox_date.currentText())
-        # self.fields_list.append(self.comboBox_activity.currentText())
-        # self.fields_list.append(self.comboBox_details.currentText())
-        # self.fields_list.append(self.comboBox_time.currentText())
-        # self.fields_list.append(self.comboBox_involved_people.currentText())
+        self.fields_list.append(self.comboBox_date.currentText())
+        self.fields_list.append(self.comboBox_activity.currentText())
+        self.fields_list.append(self.comboBox_details.currentText())
+        self.fields_list.append(self.comboBox_time.currentText())
+        self.fields_list.append(self.comboBox_involved_people.currentText())
 
+        # for i, combo in enumerate([self.comboBox_date, self.comboBox_activity, self.comboBox_details, self.comboBox_time, self.comboBox_involved_people]):
+        #     text = combo.currentText()
+        #     if text != "No field":
+        #         self.fields_list.append(text)
+        #     else:
+        #         self.normalized_fields_names.remove(self.normalized_fields_names[i]) 
+         
     def validate_duplicates_combobox(self):
         # If there are one field of the csv file for more than one field of the workspace returns true, else false
         # for i in range(5):
@@ -589,6 +589,59 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
 
+        self.table1.selectionModel().selectionChanged.connect(self.recordSelected)
+
+    def recordSelected(self):
+        # Load al data of the selected record in the widgets of the Manager Register
+        item_selected = self.table1.selectionModel().selectedRows()
+        for i in item_selected:
+            row = i.row()
+            date = self.workspace.dataset["Date"][row]
+            activity = self.workspace.dataset["Activity"][row]
+            details = self.workspace.dataset["Details"][row]
+            time = self.workspace.dataset["Time"][row]
+            people = self.workspace.dataset["Involved People"][row]
+
+            print("date: ", date)
+            print("activity: ", activity)
+            print("details: ", details)
+            print("time: ", time)
+            print("involved people: ", people)
+
+            # Set date in the QDateEdit widget
+            self.date_selected.setDate(QtCore.QDate(date.year, date.month, date.day))
+
+            # Set time in the corresponding spins boxes
+            time = time.split(":")
+            self.spin_hours.setValue(int(time[0]))
+            self.spin_min.setValue(int(time[1]))
+            self.spin_sec.setValue(int(time[2]))
+
+            # Set activities in the activities list
+            activity = activity.split(",")
+            activities_model = QtGui.QStandardItemModel()
+            for i in range(len(activity)):
+                activities_model.appendRow(QtGui.QStandardItem(activity[i]))
+            self.activities_list.setModel(activities_model)
+
+            # Set details in the details list
+            if str(details) != "nan":
+                details = details.split(",")
+                details_model = QtGui.QStandardItemModel()
+                for i in range(len(details)):
+                    details_model.appendRow(QtGui.QStandardItem(details[i]))
+                self.details_list.setModel(details_model)
+
+            # Set involved people in the involved people list
+            if str(people) != "nan":
+                people = people.split(",")
+                people_model = QtGui.QStandardItemModel()
+                for i in range(len(people)):
+                    people_model.appendRow(QtGui.QStandardItem(people[i]))
+                self.involved_people_list.setModel(people_model)
+
+
+
     def actsItemChanged(self, prev_label, new_label = ""):
     # def actsItemChanged(self, item):
         # It take the previously item selected and change it for the new item
@@ -739,8 +792,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         rows_num = len(dataset)
         cols_num = self.table1.columnCount()
         values = dataset.values
-        print("dataset")
-        print(dataset)
+
         if rows_num > 100: # If there are more rows than 100 (default number)
             self.table1.setRowCount(rows_num)
         elif rows_num < 100:
@@ -809,14 +861,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         import_csv.show()
 
     def eventFilter(self, obj, event):
-        # print("event: ", event, " | obj: ", obj)
         if self.workspace != None:
             if event.type() == QtCore.QEvent.FocusIn: # If focus in widget
                 self.mousePressEvent(event)
                 if type(obj) == type(QtWidgets.QPushButton()): # If button it's one of the label filters
                     btn_name = obj.objectName()
                     if btn_name == "button_hide_act":
-                        # print("hide_act")
                         self.hideAct()
                     elif btn_name == "button_visible_act":
                         self.visibleAct()
@@ -842,8 +892,17 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                         if obj.currentText() != self.workspace.selected_date_option: # If option was changed
                             self.workspace.setSelectedDate(obj.currentText(), self)
                             self.loadTable(self.workspace.dataset)
+            
+            elif type(obj) == type(QtWidgets.QTableWidget()): # If object is the main table
+                # print("event: ", event)
+                if type(event) == QtGui.QKeyEvent:
+                    if event.key() == 16777216: # Escape key
+                        self.table1.clearSelection()
 
         return super().eventFilter(obj, event)
+
+    def loadSelectedRecord(self, ):
+        pass
 
     def unselectListViewItems(self, obj):
         if type(obj) != type(QtWidgets.QListView()):
