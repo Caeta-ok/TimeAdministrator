@@ -11,6 +11,7 @@ import os
 import pickle
 import datetime as dt
 from warning_msg_replace_label import Ui_warning_msg_replace_label
+from warning_msg_record import Ui_recordWin
 
 class Workspace:
     def __init__(self, name):
@@ -444,6 +445,213 @@ class WarningMsgReplaceLabel(QtWidgets.QDialog, Ui_warning_msg_replace_label):
         # self.label.
         # self.
 # --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+class WarningMsgRecord(QtWidgets.QDialog, Ui_recordWin):
+    def __init__(self, parent = None):
+        self.parent = parent
+        super().__init__(self.parent.parent)
+        self.setupUi(self)
+    
+    def setText(self, string):
+        font = QtGui.QFont()
+        font.setPixelSize(13)
+        self.label.setFont(font)
+        string_width = self.label.fontMetrics().boundingRect(string).width()
+        self.label.setMinimumWidth(string_width)
+        self.label.setText(string)
+        self.setMinimumWidth(string_width + 20)
+        self.label.move(10, 5)
+        self.label.show()
+    
+    def setFunction(self, function):
+        self.function = function
+    
+    def accept(self):
+        self.function()
+        self.destroy()
+
+    def reject(self):
+        self.destroy()
+
+class RecordManager:
+    def __init__(self, parent):
+        self.parent = parent
+        self.parent.table1.selectionModel().selectionChanged.connect(self.selectRecord)
+        self.flag_activity = False
+        self.flag_time = False
+        self.parent.spin_hours.valueChanged.connect(self.timeSpinChanged)
+        self.parent.spin_min.valueChanged.connect(self.timeSpinChanged)
+        self.parent.spin_sec.valueChanged.connect(self.timeSpinChanged)
+        # self.parent.activity_line_edit.textChanged.connect(self.activityChanged)
+        
+        self.parent.update_button.clicked.connect(self.showWarningMsgUpdate)
+        
+        self.setEmptyListModels()
+
+        self.parent.activities_list.model().itemChanged.connect(self.activityChanged)
+        self.parent.details_list.model().itemChanged.connect(self.detailsChanged)
+        self.parent.involved_people_list.model().itemChanged.connect(self.involvedPeopleChanged)
+
+        self.enableMainButtons()
+
+    def setEmptyListModels(self):
+        self.parent.activities_list.setModel(QtGui.QStandardItemModel())
+        self.parent.details_list.setModel(QtGui.QStandardItemModel())
+        self.parent.involved_people_list.setModel(QtGui.QStandardItemModel())
+
+    def enableMainButtons(self, state = False):
+        self.parent.update_button.setEnabled(state)
+        self.parent.new_button.setEnabled(state)
+        self.parent.delete_button.setEnabled(state)
+
+    def selectRecord(self):
+        # Load al data of the selected record in the widgets of the Manager Register
+        self.clearRecordLineEdits()
+        item_selected = self.parent.table1.selectionModel().selectedRows()
+        for i in item_selected:
+            row = i.row()
+            date = self.parent.workspace.dataset["Date"][row]
+            activity = self.parent.workspace.dataset["Activity"][row]
+            details = self.parent.workspace.dataset["Details"][row]
+            time = self.parent.workspace.dataset["Time"][row]
+            people = self.parent.workspace.dataset["Involved People"][row]
+
+            # Set date in the QDateEdit widget
+            self.parent.date_selected.setDate(QtCore.QDate(date.year, date.month, date.day))
+
+            # Set time in the corresponding spins boxes
+            time = time.split(":")
+            self.parent.spin_hours.setValue(int(time[0]))
+            self.parent.spin_min.setValue(int(time[1]))
+            self.parent.spin_sec.setValue(int(time[2]))
+
+            # Set activities in the activities list
+            activity = activity.split(",")
+            activities_model = QtGui.QStandardItemModel()
+            for i in range(len(activity)):
+                # activities_model.appendRow(QtGui.QStandardItem(activity[i]))
+                self.parent.activities_list.model().appendRow(QtGui.QStandardItem(activity[i]))
+            # self.parent.activities_list.setModel(activities_model)
+            # self.parent.activities_list.selectionModel().selectionChanged.connect(self.selectActivityFromRecord)
+
+            # Set details in the details list
+            details_model = QtGui.QStandardItemModel()
+            if str(details) != "nan":
+                details = details.split(",")
+                for i in range(len(details)):
+                    # details_model.appendRow(QtGui.QStandardItem(details[i]))
+                    self.parent.details_list.model().appendRow(QtGui.QStandardItem(activity[i]))
+            # self.parent.details_list.setModel(details_model)
+            # self.parent.details_list.selectionModel().selectionChanged.connect(self.selectDetailsFromRecord)
+    
+            # Set involved people in the involved people list
+            people_model = QtGui.QStandardItemModel()
+            if str(people) != "nan":
+                people = people.split(",")
+                for i in range(len(people)):
+                    # people_model.appendRow(QtGui.QStandardItem(people[i]))
+                    self.involved_people_list.model().appendRow(QtGui.QStandardItem(people[i]))
+            # self.parent.involved_people_list.setModel(people_model)
+            # self.parent.involved_people_list.selectionModel().selectionChanged.connect(self.selectInvolvedPeopleFromRecord)
+
+    def clearSelectedRecord(self):
+        # Clear all widgets of the Manage Record section
+        self.parent.date_selected.setDate(QtCore.QDate(2000, 1, 1))
+        self.parent.spin_hours.setValue(0)
+        self.parent.spin_min.setValue(0)
+        self.parent.spin_sec.setValue(0)
+        
+        self.parent.activities_list.model().clear()
+        self.parent.details_list.model().clear()
+        self.parent.involved_people_list.model().clear()
+        self.clearRecordLineEdits()
+
+    def clearRecordLineEdits(self):
+        # Clear the line edits of the manage record section
+        self.parent.activity_line_edit.clear()
+        self.parent.details_line_edit.clear()
+        self.parent.involved_people_line_edit.clear()
+
+    def selectActivityFromRecord(self):
+        item_selected = self.parent.activities_list.selectedIndexes()
+        for index in item_selected:
+            item = self.parent.activities_list.model().itemFromIndex(index)
+            self.parent.activity_line_edit.setText(item.text())
+
+    def selectDetailsFromRecord(self):
+        item_selected = self.parent.details_list.selectedIndexes()
+        for index in item_selected:
+            item = self.parent.details_list.model().itemFromIndex(index)
+            self.parent.details_line_edit.setText(item.text())
+
+    def selectInvolvedPeopleFromRecord(self):
+        item_selected = self.parent.involved_people_list.selectedIndexes()
+        for index in item_selected:
+            item = self.parent.involved_people_list.model().itemFromIndex(index)
+            self.parent.involved_people_line_edit.setText(item.text())
+    
+    def activityChanged(self):
+        print("activityChanged")
+
+    def detailsChanged(self):
+        pass
+
+    def involvedPeopleChanged(self):
+        pass
+
+
+    # def activityLabelChanged(self):
+    #     self.flag_activity = False
+    #     if self.parent.activity_line_edit.text() != "":
+    #         self.flag_activity = True
+    #     self.enableRecordManagerButtons()
+
+    def timeSpinChanged(self):
+        # Verify that at least 1 of the spin box has a value bigger than 0 for activate the time flag
+        self.flag_time = False
+        for value in [self.parent.spin_hours.value(), self.parent.spin_min.value(), self.parent.spin_sec.value()]:
+            if value > 0:
+                self.flag_time = True
+                break
+        self.enableRecordManagerButtons()
+
+    def enableRecordManagerButtons(self):
+        if self.flag_time == True and self.flag_activity == True:
+            self.enableMainButtons(True)
+        else:
+            self.enableMainButtons()
+    
+    def showWarningMsgUpdate(self):
+        string = "Are you sure you want to update the selected time record?"
+        warning_msg = WarningMsgRecord(self)
+        warning_msg.setText(string)
+        warning_msg.setFunction(self.updateRecord)
+        warning_msg.show()
+
+    def showWarningMsgNew(self):
+        string = "Are you sure you want to create a new time record?"
+        warning_msg = WarningMsgRecord(self)
+        warning_msg.setText(string)
+        warning_msg.setFunction(self.newRecord)
+        warning_msg.show()
+
+    def showWarningMsgDelete(self):
+        string = "Are you sure you want to delete the selected time record?"
+        warning_msg = WarningMsgRecord(self)
+        warning_msg.setText(string)
+        warning_msg.setFunction(self.deleteRecord)
+        warning_msg.show()
+    
+    def updateRecord(self):
+        print("updateRecord")
+
+
+    def newRecord(self):
+        pass
+
+    def deleteRecord(self):
+        pass
+
 class Win0(QtWidgets.QMainWindow, Ui_win0):
     def __init__(self):
         super().__init__()
@@ -589,61 +797,12 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.hidden_acts_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenActs)
         self.hidden_people_list.selectionModel().selectionChanged.connect(self.itemSelectedHiddenPeople)
 
-        self.table1.selectionModel().selectionChanged.connect(self.selectRecord)
+        # self.activities_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
+        # self.details_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
+        # self.involved_people_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
 
-    def selectRecord(self):
-        # Load al data of the selected record in the widgets of the Manager Register
-        item_selected = self.table1.selectionModel().selectedRows()
-        for i in item_selected:
-            row = i.row()
-            date = self.workspace.dataset["Date"][row]
-            activity = self.workspace.dataset["Activity"][row]
-            details = self.workspace.dataset["Details"][row]
-            time = self.workspace.dataset["Time"][row]
-            people = self.workspace.dataset["Involved People"][row]
+        self.record_manager = RecordManager(self)
 
-            # Set date in the QDateEdit widget
-            self.date_selected.setDate(QtCore.QDate(date.year, date.month, date.day))
-
-            # Set time in the corresponding spins boxes
-            time = time.split(":")
-            self.spin_hours.setValue(int(time[0]))
-            self.spin_min.setValue(int(time[1]))
-            self.spin_sec.setValue(int(time[2]))
-
-            # Set activities in the activities list
-            activity = activity.split(",")
-            activities_model = QtGui.QStandardItemModel()
-            for i in range(len(activity)):
-                activities_model.appendRow(QtGui.QStandardItem(activity[i]))
-            self.activities_list.setModel(activities_model)
-
-            # Set details in the details list
-            if str(details) != "nan":
-                details = details.split(",")
-                details_model = QtGui.QStandardItemModel()
-                for i in range(len(details)):
-                    details_model.appendRow(QtGui.QStandardItem(details[i]))
-                self.details_list.setModel(details_model)
-
-            # Set involved people in the involved people list
-            if str(people) != "nan":
-                people = people.split(",")
-                people_model = QtGui.QStandardItemModel()
-                for i in range(len(people)):
-                    people_model.appendRow(QtGui.QStandardItem(people[i]))
-                self.involved_people_list.setModel(people_model)
-
-    def unselectRecord(self):
-        self.date_selected.setDate(QtCore.QDate(2000, 1, 1))
-        self.spin_hours.setValue(0)
-        self.spin_min.setValue(0)
-        self.spin_sec.setValue(0)
-        
-        self.activities_list.model().clear()
-        self.details_list.model().clear()
-        self.involved_people_list.model().clear()
-        
     def actsItemChanged(self, prev_label, new_label = ""):
     # def actsItemChanged(self, item):
         # It take the previously item selected and change it for the new item
@@ -900,12 +1059,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                 if type(event) == QtGui.QKeyEvent:
                     if event.key() == 16777216: # Escape key
                         self.table1.clearSelection()
-                        self.unselectRecord()
+                        self.record_manager.clearSelectedRecord()
 
         return super().eventFilter(obj, event)
-
-    def loadSelectedRecord(self, ):
-        pass
 
     def unselectListViewItems(self, obj):
         if type(obj) != type(QtWidgets.QListView()):
