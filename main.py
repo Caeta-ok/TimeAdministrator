@@ -78,15 +78,19 @@ class WorkspaceCsv(Workspace):
         self.handled_dataset = self.__original_dataset
 
     def setData(self, dataset): # Change name to "setDataStored"
-        self.__original_dataset = dataset
+        # self.__original_dataset = dataset
+        dataset = dataset.set_index("Date")
         # if os.path.exists(self.path_csv): # Verifiy if exists path_csv and if so remove it
         #     os.remove(self.path_csv)
         # print("setData -------------------------------------------------------")
         # print(self.dataset)
         # self.__original_dataset.
-
+        print("setData")
+        print(dataset)
+        print("\n\n\n")
+        dataset.to_csv(self.path_csv, sep = ";")
         # print(self.__original_dataset)
-        self.__original_dataset.to_csv(self.path_csv, sep = ";")
+        # self.__original_dataset.to_csv(self.path_csv, sep = ";")
 
     def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
@@ -447,7 +451,7 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
             self.normalized_dataset = self.imported_dataset[[self.fields_list[i] for i in range(len(self.fields_list))]]
             self.normalized_dataset.columns = self.normalized_fields_names
             self.normalized_dataset["Date"] = pd.to_datetime(self.normalized_dataset["Date"], format = "%d/%m/%Y", errors = "coerce")
-            self.normalized_dataset = self.normalized_dataset.set_index("Date")
+            # self.normalized_dataset = self.normalized_dataset.set_index("Date")
 
             self.parent.workspace.setData(self.normalized_dataset)
             self.parent.workspace.loadDataset()
