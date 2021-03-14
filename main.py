@@ -7,11 +7,20 @@ from matplotlib.figure import Figure
 from ConfigurateWorkspace import Ui_ConfigurateWorkspace
 from ImportCsv import Ui_ImportCsv
 import pandas as pd
+import numpy as np
 import os
 import pickle
 import datetime as dt
 from warning_msg_replace_label import Ui_warning_msg_replace_label
 from warning_msg_record import Ui_recordWin
+# from pyspark.sql import Window
+
+def checkEmptyString(string):
+    # If string is empty returns True else False
+    for i in string:
+        if i != " ":
+            return False
+    return True   
 
 class Workspace:
     def __init__(self, name):
@@ -25,11 +34,15 @@ class Workspace:
 
 class WorkspaceCsv(Workspace):
     def __init__(self, name, directory):
+        # Cannot set a parent because PyQt5 objects cannot be stored in pickle files
         super().__init__(name)
         self.directory = directory.replace("/", "\\") # Not contains the name of the file, only the path
         self.sep = ";"
-        self.dataset = None
+        # self.dataset = None
+        self.handled_dataset = None
+        self.__original_dataset = None
         self.path_csv = self.directory + "\\" + self.name + ".csv"
+        self.included = None
 
         # self.details_labels_show = []
         self.visible_activities_labels = []
@@ -48,49 +61,70 @@ class WorkspaceCsv(Workspace):
             file.close()
 
         # ------------------------------------------------- Load dataframe with csv data and configurate it
-        self.dataset = pd.read_csv(self.path_csv, sep = ";")
+        self.__original_dataset = pd.read_csv(self.path_csv, sep = ";")
+        self.__original_dataset["Id"] = pd.Series(data = [i for i in range(len(self.__original_dataset))])
 
-        if len(self.dataset) > 0: # If there are one record at least
-            self.dataset[["Date"]] = self.dataset[["Date"]].apply(pd.to_datetime)
-            self.dataset["Date"] = self.dataset["Date"].dt.date
-            self.dataset = self.dataset.sort_values("Date")
+        if len(self.__original_dataset) > 0: # If there are one record at least
+            # self.__original_dataset[["Date"]] = self.__original_dataset[["Date"]].apply(pd.to_datetime)
+            self.__original_dataset[["Date"]] = self.__original_dataset[["Date"]].apply(pd.to_datetime)
+            self.__original_dataset["Date"] = self.__original_dataset["Date"].dt.date
+            self.__original_dataset = self.__original_dataset.sort_values("Date")
+
+        print("loadDataset: original_dataset")
+        print(self.__original_dataset)
+        # self.__original_dataset = self.__original_dataset.set_index("Date")
+        # print("original_dataset")
+        # print(self.__original_dataset)
+        self.handled_dataset = self.__original_dataset
 
     def setData(self, dataset): # Change name to "setDataStored"
-        self.dataset = dataset
+        self.__original_dataset = dataset
         # if os.path.exists(self.path_csv): # Verifiy if exists path_csv and if so remove it
         #     os.remove(self.path_csv)
         # print("setData -------------------------------------------------------")
         # print(self.dataset)
-        self.dataset.to_csv(self.path_csv, sep = ";")
+        # self.__original_dataset.
+
+        # print(self.__original_dataset)
+        self.__original_dataset.to_csv(self.path_csv, sep = ";")
 
     def setSelectedDate(self, option = "Last year", parent = None):
         self.selected_date_option = option
         self.loadDataset() # Load dataset from csv file
+        # print("handled_dataset")
+        # print(self.handled_dataset)
 
-        if len(self.dataset) > 0:
+        if len(self.handled_dataset) > 0: # If original dataset have at least onje item
             if self.selected_date_option != "Custom period":
                 if self.selected_date_option == "Last month":
                     parent.setEnabledSelectionCalendarButtons(False)
-                    included = self.dataset["Date"].map(lambda x: x.month) == dt.date.today().month
+                    # included = self.dataset["Date"].map(lambda x: x.month) == dt.date.today().month
+                    self.included = self.handled_dataset["Date"].map(lambda x: x.month) == dt.date.today().month
 
                 elif self.selected_date_option == "Last year":
                     parent.setEnabledSelectionCalendarButtons(False)
-                    included = self.dataset["Date"].map(lambda x: x.year) == 2020 # 2020 for test because I don't have a prepared dataset with more years
+                    # included = self.dataset["Date"].map(lambda x: x.year) == 2020 # 2020 for test because I don't have a prepared dataset with more years
+                    self.included = self.handled_dataset["Date"].map(lambda x: x.year) == 2020
 
                 elif self.selected_date_option == "Entire history":
                     parent.setEnabledSelectionCalendarButtons(False)
-                    included = self.dataset["Date"].map(lambda x: x == x)
+                    # included = self.dataset["Date"].map(lambda x: x == x)
+                    self.included = self.handled_dataset["Date"].map(lambda x: x == x)
 
-                if len(self.dataset[included]) > 0: # "included" is the selected data in previous ifs
-                    self.initial_date = self.dataset[included].values[0][0]
-                    self.final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
-            else:
+                # if len(self.dataset[included]) > 0: # "included" is the selected data in previous ifs
+                #     self.initial_date = self.dataset[included].values[0][0]
+                #     self.final_date = self.dataset[included].values[len(self.dataset[included]) - 1][0]
+
+                # Set the initial and final date
+                if len(self.handled_dataset[self.included]) > 0: # "included" is the selected data in previous ifs
+                    self.initial_date = self.handled_dataset[self.included].values[0][0]
+                    self.final_date = self.handled_dataset[self.included].values[len(self.handled_dataset[self.included]) - 1][0]
+            else: # If option is custom period
                 parent.setEnabledSelectionCalendarButtons(True)
-                included = self.dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
-            print("    len(dataset[included]): ", len(self.dataset[included]))
-            self.dataset = self.dataset[included]
-            self.dataset.index = pd.RangeIndex(0, len(self.dataset))
-
+                # included = self.dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
+                self.included = self.handled_dataset["Date"].map(lambda x: self.initial_date <= x <= self.final_date)
+            self.handled_dataset = self.handled_dataset[self.included]
+ 
             # ---------------------------------------------------------------------------- Set previously labels activities
             hidden_activities = self.hidden_activities_labels
             hidden_people = self.hidden_involved_people_labels
@@ -110,7 +144,7 @@ class WorkspaceCsv(Workspace):
     def setActivitiesLabels(self):
         # By default all activities labels are stored in activity_labels_show list
         self.visible_activities_labels = []
-        for i in self.dataset.loc[:, "Activity"]:
+        for i in self.handled_dataset.loc[:, "Activity"]:
             if str(i) != "nan":
                 record_labels = str(i).split(",")
                 for label in record_labels:
@@ -121,7 +155,7 @@ class WorkspaceCsv(Workspace):
     def setInvolvedPeopleLabels(self):
         # By default all people labels are stored in involved_people_labels_show list
         self.visible_involved_people_labels = []
-        for i in self.dataset.loc[:, "Involved People"]:
+        for i in self.handled_dataset.loc[:, "Involved People"]:
             if str(i) != "nan":
                 record_labels = str(i).split(",")
                 for label in record_labels:
@@ -142,17 +176,17 @@ class WorkspaceCsv(Workspace):
     def filterActivitiesLabels(self):
         # If records which contains the activities labels that are hidden it will be removed of the dataframe to show
         if len(self.hidden_activities_labels) > 0:
-            for i, string in enumerate(self.dataset.loc[:, "Activity"]):
+            for i, string in enumerate(self.handled_dataset.loc[:, "Activity"]):
                 if self.labelInList(string, self.hidden_activities_labels):
-                    self.dataset.drop([i], axis = 0, inplace = True)
-            self.dataset.index = pd.RangeIndex(0, len(self.dataset))
+                    self.handled_dataset.drop([i], axis = 0, inplace = True)
+            self.handled_dataset.index = pd.RangeIndex(0, len(self.handled_dataset)) # ??
 
     def filterPeopleLabels(self):
         if len(self.hidden_involved_people_labels) > 0:
-            for i, string in enumerate(self.dataset.loc[:, "Involved People"]):
+            for i, string in enumerate(self.handled_dataset.loc[:, "Involved People"]):
                 if self.labelInList(string, self.hidden_involved_people_labels):
-                    self.dataset.drop([i], axis = 0, inplace = True)
-            self.dataset.index = pd.RangeIndex(0, len(self.dataset))
+                    self.handled_dataset.drop([i], axis = 0, inplace = True)
+            # self.handled_dataset.index = pd.RangeIndex(0, len(self.handled_dataset)) # =??
 
     def removeRecord(self, dataset, index):
         print("removeRecord")
@@ -168,11 +202,11 @@ class WorkspaceCsv(Workspace):
         # Get records from the csv file of the workspace
         dataset = pd.read_csv(self.path_csv, sep = ";")
         for i, string in enumerate(dataset["Activity"]):
-            split_string = string.split(",") # Bug because there are a nan string
+            split_string = string.split(",")
             new_string = ""
             j = 0
             # If new_label has no any character and if split_string has only 1 element remove the record that contains the modified label
-            if len(split_string) == 1 and new_label == "":
+            if len(split_string) == 1 and (new_label == "" or checkEmptyString(new_label) == False):
                 if split_string[0] == prev_label:
                     self.removeRecord(dataset, i)
             else: # If no, iterate on all elements of split_string and replace the string which = prev_label for new_label
@@ -218,7 +252,30 @@ class WorkspaceCsv(Workspace):
         dataset["Date"] = pd.to_datetime(dataset["Date"], format = "%Y-%m-%d")
         dataset = dataset.set_index("Date")
         dataset.to_csv(self.path_csv, sep = ";")
+    
+    def modifyTimeRecord(self, row, date, activity, details, time, involved_people, parent = None):
+        # Entry data types
+            # row: int
+            # date: datetime.date(yyyy-mm-dd)
+            # activity: str
+            # details: str or numpy.NaN
+            # time: datetime.time(hh:mm:ss)
+            # involved_people: str or numpy.NaN
+        dataset = self.__original_dataset
+        print("modifyTimeRecord")
+        print(" ")
+        print(dataset)
+        print("\n\n\n")
 
+
+        dataset.loc[[dataset["Id"][row]]] = [date, activity, details, time, involved_people, row]
+
+        self.setData(dataset)
+        self.setSelectedDate(parent = parent)
+        parent.loadTable(self.handled_dataset)
+        # print(self.handled_dataset)
+        # print("len included: ", len(self.included))
+        
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
     def __init__(self, parent = None):
@@ -276,7 +333,6 @@ class ConfigurateWorkspace(QtWidgets.QDialog, Ui_ConfigurateWorkspace):
         self.destroy()
 
     def reject(self):
-        print("Reject")
         self.destroy()
 
     def selectCsvDirectory(self):
@@ -396,7 +452,7 @@ class ImportCsv(QtWidgets.QDialog, Ui_ImportCsv):
             self.parent.workspace.setData(self.normalized_dataset)
             self.parent.workspace.loadDataset()
             self.parent.workspace.setSelectedDate(parent = self.parent)
-            self.parent.loadTable(self.parent.workspace.dataset)
+            self.parent.loadTable(self.parent.workspace.handled_dataset)
             self.destroy()
 
     def reject(self):
@@ -479,18 +535,23 @@ class RecordManager:
         self.parent.table1.selectionModel().selectionChanged.connect(self.selectRecord)
         self.flag_activity = False
         self.flag_time = False
-        self.parent.spin_hours.valueChanged.connect(self.timeSpinChanged)
-        self.parent.spin_min.valueChanged.connect(self.timeSpinChanged)
-        self.parent.spin_sec.valueChanged.connect(self.timeSpinChanged)
+        self.parent.spin_hours.valueChanged.connect(self.enableRecordManagerButtons)
+        self.parent.spin_min.valueChanged.connect(self.enableRecordManagerButtons)
+        self.parent.spin_sec.valueChanged.connect(self.enableRecordManagerButtons)
         # self.parent.activity_line_edit.textChanged.connect(self.activityChanged)
-        
+        self.selected_row = 0
         self.parent.update_button.clicked.connect(self.showWarningMsgUpdate)
         
         self.setEmptyListModels()
 
-        self.parent.activities_list.model().itemChanged.connect(self.activityChanged)
-        self.parent.details_list.model().itemChanged.connect(self.detailsChanged)
-        self.parent.involved_people_list.model().itemChanged.connect(self.involvedPeopleChanged)
+        # self.parent.activities_list.model().itemChanged.connect(self.activityChanged)
+        # self.parent.activities_list.model().itemChanged.connect(self.checkActivityForRecord)
+        # self.parent.details_list.model().itemChanged.connect(self.detailsChanged)
+        # self.parent.involved_people_list.model().itemChanged.connect(self.involvedPeopleChanged)
+
+        # self.parent.activities_list.model().itemChanged.connect(self.enableRecordManagerButtons)
+        # self.parent.details_list.model().itemChanged.connect(self.enableRecordManagerButtons)
+        # self.parent.involved_people_list.model().itemChanged.connect(self.enableRecordManagerButtons)
 
         self.enableMainButtons()
 
@@ -499,6 +560,10 @@ class RecordManager:
         self.parent.details_list.setModel(QtGui.QStandardItemModel())
         self.parent.involved_people_list.setModel(QtGui.QStandardItemModel())
 
+        self.parent.activities_list.model().itemChanged.connect(self.enableRecordManagerButtons)
+        self.parent.details_list.model().itemChanged.connect(self.enableRecordManagerButtons)
+        self.parent.involved_people_list.model().itemChanged.connect(self.enableRecordManagerButtons)
+
     def enableMainButtons(self, state = False):
         self.parent.update_button.setEnabled(state)
         self.parent.new_button.setEnabled(state)
@@ -506,15 +571,26 @@ class RecordManager:
 
     def selectRecord(self):
         # Load al data of the selected record in the widgets of the Manager Register
-        self.clearRecordLineEdits()
+        # self.clearSelectedRecord()
+
+        dataset = self.parent.workspace.handled_dataset
         item_selected = self.parent.table1.selectionModel().selectedRows()
         for i in item_selected:
-            row = i.row()
-            date = self.parent.workspace.dataset["Date"][row]
-            activity = self.parent.workspace.dataset["Activity"][row]
-            details = self.parent.workspace.dataset["Details"][row]
-            time = self.parent.workspace.dataset["Time"][row]
-            people = self.parent.workspace.dataset["Involved People"][row]
+            # self._selected_row = i.row() # Same number that the id number in the handled_dataset
+            self.selected_row = i.row()
+
+            # Get values from the selected row
+            date = dataset.loc[dataset["Id"][self.selected_row]]["Date"]
+            activity = dataset.loc[dataset["Id"][self.selected_row]]["Activity"]
+            details = dataset.loc[dataset["Id"][self.selected_row]]["Details"]
+            time = dataset.loc[dataset["Id"][self.selected_row]]["Time"]
+            people = dataset.loc[dataset["Id"][self.selected_row]]["Involved People"]
+            
+            # print("date: ", date)
+            # print("activity: ", activity)
+            # print("details: ", details)
+            # print("time: ", time)
+            # print("people: ", people)
 
             # Set date in the QDateEdit widget
             self.parent.date_selected.setDate(QtCore.QDate(date.year, date.month, date.day))
@@ -526,44 +602,71 @@ class RecordManager:
             self.parent.spin_sec.setValue(int(time[2]))
 
             # Set activities in the activities list
-            activity = activity.split(",")
-            activities_model = QtGui.QStandardItemModel()
-            for i in range(len(activity)):
-                # activities_model.appendRow(QtGui.QStandardItem(activity[i]))
-                self.parent.activities_list.model().appendRow(QtGui.QStandardItem(activity[i]))
+            # activity = activity.split(",")
+            # activities_model = QtGui.QStandardItemModel()
+            # for i in range(len(activity)):
+            #     activities_model.appendRow(QtGui.QStandardItem(activity[i]))
             # self.parent.activities_list.setModel(activities_model)
-            # self.parent.activities_list.selectionModel().selectionChanged.connect(self.selectActivityFromRecord)
+
+            activity = activity.split(",")
+            for i in range(len(activity)):
+                self.parent.activities_list.model().appendRow(QtGui.QStandardItem(activity[i]))
+
 
             # Set details in the details list
-            details_model = QtGui.QStandardItemModel()
+            # details_model = QtGui.QStandardItemModel()
+            # if str(details) != "nan":
+            #     details = details.split(",")
+            #     for i in range(len(details)):
+            #         details_model.appendRow(QtGui.QStandardItem(details[i]))
+            # self.parent.details_list.setModel(details_model)
+
             if str(details) != "nan":
                 details = details.split(",")
                 for i in range(len(details)):
-                    # details_model.appendRow(QtGui.QStandardItem(details[i]))
-                    self.parent.details_list.model().appendRow(QtGui.QStandardItem(activity[i]))
-            # self.parent.details_list.setModel(details_model)
-            # self.parent.details_list.selectionModel().selectionChanged.connect(self.selectDetailsFromRecord)
-    
+                    self.parent.details_list.model().appendRow(QtGui.QStandardItem(details[i]))
+
             # Set involved people in the involved people list
-            people_model = QtGui.QStandardItemModel()
+            # people_model = QtGui.QStandardItemModel()
+            # if str(people) != "nan":
+            #     people = people.split(",")
+            #     for i in range(len(people)):
+            #         people_model.appendRow(QtGui.QStandardItem(people[i]))
+            # self.parent.involved_people_list.setModel(people_model)
+
             if str(people) != "nan":
                 people = people.split(",")
                 for i in range(len(people)):
-                    # people_model.appendRow(QtGui.QStandardItem(people[i]))
-                    self.involved_people_list.model().appendRow(QtGui.QStandardItem(people[i]))
-            # self.parent.involved_people_list.setModel(people_model)
-            # self.parent.involved_people_list.selectionModel().selectionChanged.connect(self.selectInvolvedPeopleFromRecord)
+                    self.parent.involved_people_list.model().appendRow(QtGui.QStandardItem(people[i]))
 
     def clearSelectedRecord(self):
         # Clear all widgets of the Manage Record section
+
         self.parent.date_selected.setDate(QtCore.QDate(2000, 1, 1))
         self.parent.spin_hours.setValue(0)
         self.parent.spin_min.setValue(0)
         self.parent.spin_sec.setValue(0)
-        
-        self.parent.activities_list.model().clear()
-        self.parent.details_list.model().clear()
-        self.parent.involved_people_list.model().clear()
+        self.setEmptyListModels()
+        # self.parent.activities_list.model().clear()
+        # self.parent.details_list.model().clear()
+        # self.parent.involved_people_list.model().clear()
+        # activities_model = self.parent.activities_list.model()
+        # details_model = self.parent.details_list.model()
+        # people_model = self.parent.involved_people_list.model()
+
+        # self.parent.activities_list.model().removeRows(activities_model.rowCount())
+        # self.parent.details_list.model().removeRows(details_model.rowCount())
+        # self.parent.involved_people_list.model().removeRows(people_model.rowCount())
+
+        # activities_model = QtGui.QStandardItemModel()
+        # self.parent.activities_list.setModel(activities_model)
+
+        # details_model = QtGui.QStandardItemModel()
+        # self.parent.details_list.setModel(details_model)
+
+        # people_model = QtGui.QStandardItemModel()
+        # self.parent.involved_people_list.setModel(people_model)
+
         self.clearRecordLineEdits()
 
     def clearRecordLineEdits(self):
@@ -590,8 +693,21 @@ class RecordManager:
             item = self.parent.involved_people_list.model().itemFromIndex(index)
             self.parent.involved_people_line_edit.setText(item.text())
     
-    def activityChanged(self):
-        print("activityChanged")
+    def checkActivityForRecord(self):
+        self.flag_activity = False
+        rows_to_delete = []
+        for i in range(self.parent.activities_list.model().rowCount()): # Check if there are at least one item is not empty
+            text = self.parent.activities_list.model().item(i).text()
+            # print("text: ", text, " | empty string: ", checkEmptyString(text))
+            if text != "" and checkEmptyString(text) == False:
+                self.flag_activity = True
+            else:
+                rows_to_delete.append(i)
+        
+        # If flag is approved, remove all empty items
+        if self.flag_activity == True:
+            for i in rows_to_delete:
+                self.parent.activities_list.model().removeRow(i)
 
     def detailsChanged(self):
         pass
@@ -599,23 +715,24 @@ class RecordManager:
     def involvedPeopleChanged(self):
         pass
 
-
     # def activityLabelChanged(self):
     #     self.flag_activity = False
     #     if self.parent.activity_line_edit.text() != "":
     #         self.flag_activity = True
     #     self.enableRecordManagerButtons()
 
-    def timeSpinChanged(self):
+    def checkTimeForRecord(self):
+    # def timeSpinChanged(self):
         # Verify that at least 1 of the spin box has a value bigger than 0 for activate the time flag
         self.flag_time = False
         for value in [self.parent.spin_hours.value(), self.parent.spin_min.value(), self.parent.spin_sec.value()]:
             if value > 0:
                 self.flag_time = True
                 break
-        self.enableRecordManagerButtons()
 
     def enableRecordManagerButtons(self):
+        self.checkActivityForRecord()
+        self.checkTimeForRecord()
         if self.flag_time == True and self.flag_activity == True:
             self.enableMainButtons(True)
         else:
@@ -643,8 +760,47 @@ class RecordManager:
         warning_msg.show()
     
     def updateRecord(self):
-        print("updateRecord")
+        # ---------------------------------------------------- Get date from the date line edit
+        qdate = self.parent.date_selected.date()
+        date = dt.date(qdate.year(), qdate.month(), qdate.day())
 
+        # ---------------------------------------------------- Create the activities string for recording in the dataset
+        activities = ""
+        row_num = self.parent.activities_list.model().rowCount()
+        i = 0
+        while i < row_num - 1:
+            activities += self.parent.activities_list.model().item(i).text() + ","
+            i += 1  
+        activities += self.parent.activities_list.model().item(i).text()
+
+        # ---------------------------------------------------- Create the details string for recording in the dataset
+        details = np.NaN
+        i = 0
+        row_num = self.parent.details_list.model().rowCount()
+        if row_num > 0:
+            while i < row_num - 1:
+                details += self.parent.details_list.model().item(i).text() + ","
+                i += 1
+            details += self.parent.details_list.model().item(i).text()
+
+        # ---------------------------------------------------- Create the involved people string for recording in the dataset
+        people = np.NaN
+        i = 0
+        row_num = self.parent.involved_people_list.model().rowCount()
+        if row_num > 0:
+            while i < row_num - 1:
+                people += self.parent.details_list.model().item(i).text() + ","
+                i += 1
+            people += self.parent.details_list.model().item(i).text()
+        
+        # ---------------------------------------------------- Get time from the spin boxes
+        hour = self.parent.spin_hours.value()
+        minute = self.parent.spin_min.value()
+        sec = self.parent.spin_sec.value()
+        time = dt.time(hour, minute, sec)
+
+        # ---------------------------------------------------- Call the workspace function
+        self.parent.workspace.modifyTimeRecord(self.selected_row, date, activities, details, time, people, self.parent)
 
     def newRecord(self):
         pass
@@ -802,6 +958,11 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         # self.involved_people_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
 
         self.record_manager = RecordManager(self)
+        QtWidgets.QShortcut("Esc", self, self.pressEsc)
+
+    def pressEsc(self):
+        self.parent.table1.clearSelection()
+        self.record_manager.clearSelectedRecord()
 
     def actsItemChanged(self, prev_label, new_label = ""):
     # def actsItemChanged(self, item):
@@ -827,16 +988,14 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
 
     def hideAct(self):
         for index in self.visible_acts_list.selectedIndexes(): # This loop has a bug
-            print("for hideAct")
             item = self.visible_acts_list.model().itemFromIndex(index)
             self.hidden_acts_list.model().appendRow(QtGui.QStandardItem(item.text()))
             self.workspace.visible_activities_labels.remove(item.text())
             self.workspace.hidden_activities_labels.append(item.text())
             self.visible_acts_list.model().removeRow(item.row())
-        print("hideAct")
         self.visible_acts_list.selectionModel().clearSelection() # Here it's the bug, it's triggering some event which calls eventFilter
         self.workspace.filterActivitiesLabels()
-        self.loadTable(self.workspace.dataset)
+        self.loadTable(self.workspace.handled_dataset)
 
     def visibleAct(self):
         for index in self.hidden_acts_list.selectedIndexes():
@@ -849,7 +1008,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.workspace.setActivitiesLabels()
         self.workspace.filterActivitiesLabels()
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
-        self.loadTable(self.workspace.dataset)
+        self.loadTable(self.workspace.handled_dataset)
 
     def hidePeople(self):
         for index in self.visible_people_list.selectedIndexes():
@@ -860,7 +1019,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.visible_people_list.model().removeRow(item.row())
         self.visible_people_list.selectionModel().clearSelection()
         self.workspace.filterPeopleLabels()
-        self.loadTable(self.workspace.dataset)
+        self.loadTable(self.workspace.handled_dataset)
 
     def visiblePeople(self):
         for index in self.hidden_people_list.selectedIndexes():
@@ -873,7 +1032,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         self.workspace.setInvolvedPeopleLabels()
         self.workspace.filterPeopleLabels()
         self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
-        self.loadTable(self.workspace.dataset)
+        self.loadTable(self.workspace.handled_dataset)
 
     def hideAllActs(self):
         pass
@@ -888,7 +1047,6 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         pass
 
     def itemSelectedVisibleActs(self):
-        # print("itemSelectedVisibleActs")
         selected_indexes = self.visible_acts_list.selectedIndexes()
         self.button_hide_act.setEnabled(bool(selected_indexes))
         self.button_visible_act.setEnabled(False)
@@ -943,9 +1101,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         # print("loadworkspace")
         self.workspace = workspace
         self.workspace.loadDataset()
-        if len(self.workspace.dataset) > 0: #If the dataset get at least 1 record
+        if len(self.workspace.handled_dataset) > 0: #If the dataset get at least 1 record
             self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
-            self.loadTable(self.workspace.dataset)
+            self.loadTable(self.workspace.handled_dataset)
         self.setEnabledWidgets(True)
 
     def loadTable(self, dataset):
@@ -972,6 +1130,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
         # -------------------------------------------------------------- Set date in the QDateEdit widgets
         d1 = self.workspace.initial_date
         d2 = self.workspace.final_date
+        print("d1: ", d1)
+        print("d2: ", d2)
+
         self.date_from.setDate(QtCore.QDate(d1.year, d1.month, d1.day))
         self.date_to.setDate(QtCore.QDate(d2.year, d2.month, d2.day))
 
@@ -1052,14 +1213,7 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
                     if type(event) == QtGui.QPaintEvent:
                         if obj.currentText() != self.workspace.selected_date_option: # If option was changed
                             self.workspace.setSelectedDate(obj.currentText(), self)
-                            self.loadTable(self.workspace.dataset)
-            
-            elif type(obj) == type(QtWidgets.QTableWidget()): # If object is the main table
-                # print("event: ", event)
-                if type(event) == QtGui.QKeyEvent:
-                    if event.key() == 16777216: # Escape key
-                        self.table1.clearSelection()
-                        self.record_manager.clearSelectedRecord()
+                            self.loadTable(self.workspace.handled_dataset)
 
         return super().eventFilter(obj, event)
 
@@ -1152,8 +1306,8 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             self.calendar.clicked.connect(self.clickCalendar)
 
     def clickCalendar(self, date):
+        print("clickCalendar")
         btn_name = self.calendar_btn.objectName()
-
         d = dt.date(date.year(), date.month(), date.day())
         # ------------------------------------------ Set date
         if btn_name != "button_date_selected":
@@ -1164,10 +1318,9 @@ class Win0(QtWidgets.QMainWindow, Ui_win0):
             elif btn_name == "button_date_to":
                 self.date_to.setDate(date)
                 self.workspace.final_date = d
-            print("Load table")
+            print("Load table: click calendar")
             self.workspace.setSelectedDate(self.workspace.selected_date_option, self)
-            self.loadTable(self.workspace.dataset)
-
+            self.loadTable(self.workspace.handled_dataset)
         else:
             self.date_selected.setDate(date)
         self.destroyCalendar()
